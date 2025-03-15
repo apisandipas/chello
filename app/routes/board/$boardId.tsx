@@ -1,26 +1,33 @@
 import {
+  defaultDropAnimationSideEffects,
   DndContext,
   DragEndEvent,
   DragOverEvent,
   DragOverlay,
   DragStartEvent,
+  KeyboardSensor,
+  MeasuringStrategy,
   MouseSensor,
   TouchSensor,
   useSensor,
   useSensors,
-  defaultDropAnimationSideEffects,
 } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
   SortableContext,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
-import { useState } from "react";
-import { BoardCard } from "../../components/BoardCard";
-import { BoardColumn } from "../../components/BoardColumn";
-import type { Card, Column } from "../../mock-data";
-import { mockBoard } from "../../mock-data";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { BoardCard } from "~/components/BoardCard";
+import { BoardColumn } from "~/components/BoardColumn";
+import {
+  getBoardFn,
+  updateCardOrderFn,
+  updateColumnOrderFn,
+} from "~/lib/services/boards";
+import type { Board, Card, Column } from "~/types";
 
 const dropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -34,22 +41,20 @@ const dropAnimation = {
 
 export const Route = createFileRoute("/board/$boardId")({
   component: BoardComponent,
+  loader: async ({ params }) =>
+    getBoardFn({ data: { boardId: params.boardId } }),
 });
 
 function BoardComponent() {
-  const { boardId } = useParams({ from: "/board/$boardId" });
-  const [board, setBoard] = useState(() => {
-    // In a real app, we would fetch the board data using the boardId
-    // For now, we'll just check if the mock board matches
-    if (mockBoard.id === boardId) {
-      return mockBoard;
-    }
-    return {
-      ...mockBoard,
-      id: boardId,
-      title: `Board ${boardId}`,
-    };
-  });
+  const boardData = Route.useLoaderData();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const [board, setBoard] = useState<Board>(boardData);
+
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
 
@@ -64,8 +69,42 @@ function BoardComponent() {
         delay: 150,
         tolerance: 5,
       },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
+
+  const updateColumnOrder = async (columns: Column[]) => {
+    try {
+      await updateColumnOrderFn({
+        data: {
+          columns: columns.map((column, index) => ({
+            id: column.id,
+            sortOrder: index,
+          })),
+        },
+      });
+    } catch (error) {
+      console.error("Failed to update column order:", error);
+    }
+  };
+
+  const updateCardOrder = async (cards: Card[], columnId: string) => {
+    try {
+      await updateCardOrderFn({
+        data: {
+          cards: cards.map((card, index) => ({
+            id: card.id,
+            sortOrder: index,
+            columnId: columnId,
+          })),
+        },
+      });
+    } catch (error) {
+      console.error("Failed to update card order:", error);
+    }
+  };
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
@@ -85,7 +124,7 @@ function BoardComponent() {
     }
   };
 
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over) {
@@ -101,10 +140,15 @@ function BoardComponent() {
         const oldIndex = board.columns.findIndex((col) => col.id === active.id);
         const newIndex = board.columns.findIndex((col) => col.id === over.id);
 
+        const newColumns = arrayMove(board.columns, oldIndex, newIndex);
+
         setBoard({
           ...board,
-          columns: arrayMove(board.columns, oldIndex, newIndex),
+          columns: newColumns,
         });
+
+        // Update the sort order in the database
+        await updateColumnOrder(newColumns);
       }
     }
 
@@ -166,6 +210,9 @@ function BoardComponent() {
             col.id === activeColumnId ? { ...col, cards: newCards } : col
           ),
         };
+
+        // Update card order in the database
+        void updateCardOrder(newCards, activeColumnId.toString());
       } else {
         // Different column
         const [movedCard] = activeColumn.cards.splice(activeCardIndex, 1);
@@ -179,38 +226,62 @@ function BoardComponent() {
             return col;
           }),
         };
+
+        // Update card order in both columns
+        void updateCardOrder(activeColumn.cards, activeColumnId.toString());
+        void updateCardOrder(overColumn.cards, overColumnId.toString());
       }
 
       return newBoard;
     });
   };
 
+  const renderBoard = () => (
+    <div className="flex gap-4 overflow-x-auto pb-4 items-start">
+      {board.columns.map((column) => (
+        <BoardColumn
+          key={column.id}
+          column={column}
+          enableDragAndDrop={isClient}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <div className="relative min-h-screen bg-gray-100">
       <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">{board.title}</h1>
-        <DndContext
-          sensors={sensors}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-          onDragOver={handleDragOver}
-        >
-          <div className="flex gap-4 overflow-x-auto pb-4">
+        <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
+        {isClient ? (
+          <DndContext
+            sensors={sensors}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragOver={handleDragOver}
+            measuring={{
+              droppable: {
+                strategy: MeasuringStrategy.Always,
+              },
+            }}
+          >
             <SortableContext
               items={board.columns.map((col) => col.id)}
               strategy={horizontalListSortingStrategy}
             >
-              {board.columns.map((column) => (
-                <BoardColumn key={column.id} column={column} />
-              ))}
+              {renderBoard()}
             </SortableContext>
-          </div>
-
-          <DragOverlay dropAnimation={dropAnimation}>
-            {activeColumn && <BoardColumn column={activeColumn} />}
-            {activeCard && <BoardCard card={activeCard} />}
-          </DragOverlay>
-        </DndContext>
+            <DragOverlay dropAnimation={dropAnimation}>
+              {activeColumn && (
+                <BoardColumn column={activeColumn} enableDragAndDrop={true} />
+              )}
+              {activeCard && (
+                <BoardCard card={activeCard} enableDragAndDrop={true} />
+              )}
+            </DragOverlay>
+          </DndContext>
+        ) : (
+          renderBoard()
+        )}
       </div>
 
       <Outlet />

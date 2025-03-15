@@ -1,11 +1,12 @@
 import {
   createRootRoute,
+  HeadContent,
   Link,
   Outlet,
-  HeadContent,
+  Scripts,
 } from "@tanstack/react-router";
-import appCss from "../index.css?url";
 import { ReactNode } from "react";
+import appCss from "../index.css?url";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -51,6 +52,7 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         </div>
         <hr />
         {children}
+        <Scripts />
       </body>
     </html>
   );

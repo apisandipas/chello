@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Card" ADD COLUMN     "sortOrder" INTEGER NOT NULL DEFAULT 0;
+
+-- AlterTable
+ALTER TABLE "Column" ADD COLUMN     "sortOrder" INTEGER NOT NULL DEFAULT 0;
