@@ -5,6 +5,7 @@ import {
   Outlet,
   Scripts,
 } from "@tanstack/react-router";
+import { Toaster } from "~/components/ui/sonner";
 import { ReactNode } from "react";
 import appCss from "../index.css?url";
 
@@ -49,10 +50,14 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
           <Link to="/about" className="[&.active]:font-bold">
             About
           </Link>
+          <Link to="/boards" className="[&.active]:font-bold">
+            Boards
+          </Link>
         </div>
         <hr />
         {children}
         <Scripts />
+        <Toaster />
       </body>
     </html>
   );

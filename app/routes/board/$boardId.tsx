@@ -18,16 +18,17 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouter } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { BoardCard } from "~/components/BoardCard";
-import { BoardColumn } from "~/components/BoardColumn";
+import { BoardCard } from "~/components/cards/BoardCard";
+import { BoardColumn } from "~/components/columns/BoardColumn";
+import { AddAnotherColumn } from "~/components/columns/AddAnotherColumn";
 import {
   getBoardFn,
   updateCardOrderFn,
   updateColumnOrderFn,
 } from "~/lib/services/boards";
-import type { Board, Card, Column } from "~/types";
+import type { Card, Column } from "~/types";
 
 const dropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -48,12 +49,11 @@ export const Route = createFileRoute("/board/$boardId")({
 function BoardComponent() {
   const boardData = Route.useLoaderData();
   const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const [board, setBoard] = useState<Board>(boardData);
 
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [activeCard, setActiveCard] = useState<Card | null>(null);
@@ -108,14 +108,14 @@ function BoardComponent() {
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const isColumn = board.columns.find((col) => col.id === active.id);
+    const isColumn = boardData.columns.find((col) => col.id === active.id);
 
     if (isColumn) {
       setActiveColumn(isColumn);
       return;
     }
 
-    const card = board.columns
+    const card = boardData.columns
       .flatMap((col) => col.cards)
       .find((card) => card.id === active.id);
 
@@ -134,21 +134,21 @@ function BoardComponent() {
     }
 
     if (active.id !== over.id) {
-      const isColumn = board.columns.find((col) => col.id === active.id);
+      const isColumn = boardData.columns.find((col) => col.id === active.id);
 
       if (isColumn) {
-        const oldIndex = board.columns.findIndex((col) => col.id === active.id);
-        const newIndex = board.columns.findIndex((col) => col.id === over.id);
+        const oldIndex = boardData.columns.findIndex(
+          (col) => col.id === active.id
+        );
+        const newIndex = boardData.columns.findIndex(
+          (col) => col.id === over.id
+        );
 
-        const newColumns = arrayMove(board.columns, oldIndex, newIndex);
-
-        setBoard({
-          ...board,
-          columns: newColumns,
-        });
+        const newColumns = arrayMove(boardData.columns, oldIndex, newIndex);
 
         // Update the sort order in the database
         await updateColumnOrder(newColumns);
+        await router.invalidate();
       }
     }
 
@@ -156,7 +156,7 @@ function BoardComponent() {
     setActiveCard(null);
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = async (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
 
@@ -165,93 +165,76 @@ function BoardComponent() {
 
     if (activeId === overId) return;
 
-    const isActiveACard = board.columns
+    const isActiveACard = boardData.columns
       .flatMap((col) => col.cards)
       .find((card) => card.id === activeId);
 
     if (!isActiveACard) return;
 
-    const activeColumnId = board.columns.find((col) =>
+    const activeColumn = boardData.columns.find((col) =>
       col.cards.find((card) => card.id === activeId)
-    )?.id;
+    );
 
-    const overColumnId =
-      board.columns.find((col) => col.cards.find((card) => card.id === overId))
-        ?.id || overId;
+    const overColumn = boardData.columns.find(
+      (col) => col.id === overId || col.cards.some((card) => card.id === overId)
+    );
 
-    if (!activeColumnId || !overColumnId) return;
+    if (!activeColumn || !overColumn) return;
 
-    setBoard((board) => {
-      const activeColumn = board.columns.find(
-        (col) => col.id === activeColumnId
-      )!;
-      const overColumn = board.columns.find((col) => col.id === overColumnId)!;
+    const activeCardIndex = activeColumn.cards.findIndex(
+      (card) => card.id === activeId
+    );
+    const overCardIndex = overColumn.cards.findIndex(
+      (card) => card.id === overId
+    );
 
-      const activeCardIndex = activeColumn.cards.findIndex(
-        (card) => card.id === activeId
+    if (activeColumn.id === overColumn.id) {
+      // Same column
+      const newCards = arrayMove(
+        activeColumn.cards,
+        activeCardIndex,
+        overCardIndex
       );
-      const overCardIndex = overColumn.cards.findIndex(
-        (card) => card.id === overId
-      );
+      // Update card order in the database
+      await updateCardOrder(newCards, activeColumn.id.toString());
+    } else {
+      // Different column
+      const updatedActiveCards = [...activeColumn.cards];
+      const updatedOverCards = [...overColumn.cards];
+      const [movedCard] = updatedActiveCards.splice(activeCardIndex, 1);
 
-      let newBoard;
+      // If dropping on a column (not a card), append to the end
+      const insertIndex =
+        overId === overColumn.id ? overColumn.cards.length : overCardIndex;
 
-      if (activeColumnId === overColumnId) {
-        // Same column
-        const newCards = arrayMove(
-          activeColumn.cards,
-          activeCardIndex,
-          overCardIndex
-        );
+      updatedOverCards.splice(insertIndex, 0, movedCard);
 
-        newBoard = {
-          ...board,
-          columns: board.columns.map((col) =>
-            col.id === activeColumnId ? { ...col, cards: newCards } : col
-          ),
-        };
+      // Update card order in both columns
+      await updateCardOrder(updatedActiveCards, activeColumn.id.toString());
+      await updateCardOrder(updatedOverCards, overColumn.id.toString());
+    }
 
-        // Update card order in the database
-        void updateCardOrder(newCards, activeColumnId.toString());
-      } else {
-        // Different column
-        const [movedCard] = activeColumn.cards.splice(activeCardIndex, 1);
-        overColumn.cards.splice(overCardIndex, 0, movedCard);
-
-        newBoard = {
-          ...board,
-          columns: board.columns.map((col) => {
-            if (col.id === activeColumnId) return activeColumn;
-            if (col.id === overColumnId) return overColumn;
-            return col;
-          }),
-        };
-
-        // Update card order in both columns
-        void updateCardOrder(activeColumn.cards, activeColumnId.toString());
-        void updateCardOrder(overColumn.cards, overColumnId.toString());
-      }
-
-      return newBoard;
-    });
+    // Invalidate to refresh the data
+    await router.invalidate();
   };
 
   const renderBoard = () => (
-    <div className="flex gap-4 overflow-x-auto pb-4 items-start">
-      {board.columns.map((column) => (
+    <div className="flex flex-nowrap gap-4 overflow-x-auto pb-4 items-start h-[calc(100vh-120px)]">
+      {boardData.columns.map((column) => (
         <BoardColumn
           key={column.id}
           column={column}
           enableDragAndDrop={isClient}
         />
       ))}
+      <AddAnotherColumn boardId={boardData.id} />
     </div>
   );
 
   return (
-    <div className="relative min-h-screen bg-gray-100">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold mb-4">{board.name}</h1>
+    <div className="relative h-screen bg-gray-100 w-full overflow-hidden">
+      <div className="p-4 h-full overflow-x-auto">
+        <h1 className="text-2xl font-bold mb-4">{boardData.name}</h1>
         {isClient ? (
           <DndContext
             sensors={sensors}
@@ -265,7 +248,7 @@ function BoardComponent() {
             }}
           >
             <SortableContext
-              items={board.columns.map((col) => col.id)}
+              items={boardData.columns.map((col) => col.id)}
               strategy={horizontalListSortingStrategy}
             >
               {renderBoard()}

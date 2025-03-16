@@ -20,6 +20,9 @@ export const getBoardFn = createServerFn({
           orderBy: {
             sortOrder: "asc",
           },
+          where: {
+            isArchived: false,
+          },
           include: {
             cards: {
               orderBy: {
@@ -102,4 +105,28 @@ export const updateCardOrderFn = createServerFn({
       )
     );
     return { success: true };
+  });
+
+export const getBoardsFn = createServerFn({
+  method: "GET",
+}).handler(async () => {
+  const boards = await prisma.board.findMany();
+  return boards;
+});
+
+export const createBoardFn = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    const validated = z.object({ name: z.string() }).safeParse(data);
+    if (!validated.success) {
+      throw new Error("Invalid data");
+    }
+    return validated.data;
+  })
+  .handler(async ({ data }) => {
+    const board = await prisma.board.create({
+      data: { name: data.name },
+    });
+    return board;
   });

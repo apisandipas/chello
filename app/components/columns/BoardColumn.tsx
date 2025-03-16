@@ -4,8 +4,10 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Column } from "../types";
-import { BoardCard } from "./BoardCard";
+import type { Column } from "../../types";
+import { AddAnotherCard } from "../cards/AddAnotherCard";
+import { BoardCard } from "../cards/BoardCard";
+import { ColumnHeader } from "./ColumnHeader";
 
 interface BoardColumnProps {
   column: Column;
@@ -33,7 +35,7 @@ export function BoardColumn({
   });
 
   const renderCards = () => (
-    <div className="space-y-3">
+    <div className="flex flex-col gap-2">
       {column.cards.map((card) => (
         <BoardCard
           key={card.id}
@@ -41,6 +43,7 @@ export function BoardColumn({
           enableDragAndDrop={enableDragAndDrop}
         />
       ))}
+      <AddAnotherCard columnId={column.id} />
     </div>
   );
 
@@ -55,7 +58,7 @@ export function BoardColumn({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-gray-100 w-80 rounded-lg p-4 ${
+      className={`bg-gray-200 min-w-80 rounded-lg p-4 pt-2 ${
         isDragging ? "opacity-50" : ""
       }`}
     >
@@ -65,10 +68,7 @@ export function BoardColumn({
           enableDragAndDrop ? "cursor-grab" : ""
         }`}
       >
-        <h2 className="font-semibold text-gray-700">{column.name}</h2>
-        <span className="text-sm text-gray-500">
-          {column.cards.length} cards
-        </span>
+        <ColumnHeader column={column} />
       </div>
 
       {enableDragAndDrop ? (

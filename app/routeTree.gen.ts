@@ -11,12 +11,19 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as BoardsImport } from './routes/boards'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
 import { Route as BoardBoardIdCardCardIdImport } from './routes/board/$boardId/card/$cardId'
 
 // Create/Update Routes
+
+const BoardsRoute = BoardsImport.update({
+  id: '/boards',
+  path: '/boards',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const AboutRoute = AboutImport.update({
   id: '/about',
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/boards': {
+      id: '/boards'
+      path: '/boards'
+      fullPath: '/boards'
+      preLoaderRoute: typeof BoardsImport
+      parentRoute: typeof rootRoute
+    }
     '/board/$boardId': {
       id: '/board/$boardId'
       path: '/board/$boardId'
@@ -94,6 +108,7 @@ const BoardBoardIdRouteWithChildren = BoardBoardIdRoute._addFileChildren(
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/boards': typeof BoardsRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
@@ -101,6 +116,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/boards': typeof BoardsRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
@@ -109,19 +125,31 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/boards': typeof BoardsRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/board/$boardId' | '/board/$boardId/card/$cardId'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/boards'
+    | '/board/$boardId'
+    | '/board/$boardId/card/$cardId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/board/$boardId' | '/board/$boardId/card/$cardId'
+  to:
+    | '/'
+    | '/about'
+    | '/boards'
+    | '/board/$boardId'
+    | '/board/$boardId/card/$cardId'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/boards'
     | '/board/$boardId'
     | '/board/$boardId/card/$cardId'
   fileRoutesById: FileRoutesById
@@ -130,12 +158,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BoardsRoute: typeof BoardsRoute
   BoardBoardIdRoute: typeof BoardBoardIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BoardsRoute: BoardsRoute,
   BoardBoardIdRoute: BoardBoardIdRouteWithChildren,
 }
 
@@ -151,6 +181,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/boards",
         "/board/$boardId"
       ]
     },
@@ -159,6 +190,9 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/boards": {
+      "filePath": "boards.tsx"
     },
     "/board/$boardId": {
       "filePath": "board/$boardId.tsx",

@@ -23,11 +23,12 @@ model Board {
 }
 
 model Column {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sortOrder Int      @default(0)
+  id         String   @id @default(uuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sortOrder  Int      @default(0)
+  isArchived Boolean  @default(false)
 
   boardId String
   board   Board  @relation(fields: [boardId], references: [id])
@@ -35,11 +36,12 @@ model Column {
 }
 
 model Card {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  sortOrder Int      @default(0)
-  columnId  String
-  columns   Column   @relation(fields: [columnId], references: [id])
+  id         String   @id @default(uuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  sortOrder  Int      @default(0)
+  isArchived Boolean  @default(false)
+  columnId   String
+  columns    Column   @relation(fields: [columnId], references: [id])
 }
