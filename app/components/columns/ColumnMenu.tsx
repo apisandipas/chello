@@ -25,7 +25,7 @@ export function ColumnMenu({ columnId }: { columnId: string }) {
       <DropdownMenuTrigger>
         <Ellipsis className="w-4 h-4 cursor-pointer" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent data-side="bottom" data-align="end">
+      <DropdownMenuContent data-side="left" data-align="end">
         <DropdownMenuLabel>Column Actions</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Add Card</DropdownMenuItem>

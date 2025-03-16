@@ -75,7 +75,7 @@ function BoardComponent() {
     })
   );
 
-  const updateColumnOrder = async (columns: Column[]) => {
+  const handleUpdateColumnOrder = async (columns: Column[]) => {
     try {
       await updateColumnOrderFn({
         data: {
@@ -90,7 +90,7 @@ function BoardComponent() {
     }
   };
 
-  const updateCardOrder = async (cards: Card[], columnId: string) => {
+  const handleUpdateCardOrder = async (cards: Card[], columnId: string) => {
     try {
       await updateCardOrderFn({
         data: {
@@ -147,7 +147,7 @@ function BoardComponent() {
         const newColumns = arrayMove(boardData.columns, oldIndex, newIndex);
 
         // Update the sort order in the database
-        await updateColumnOrder(newColumns);
+        await handleUpdateColumnOrder(newColumns);
         await router.invalidate();
       }
     }
@@ -196,7 +196,7 @@ function BoardComponent() {
         overCardIndex
       );
       // Update card order in the database
-      await updateCardOrder(newCards, activeColumn.id.toString());
+      await handleUpdateCardOrder(newCards, activeColumn.id.toString());
     } else {
       // Different column
       const updatedActiveCards = [...activeColumn.cards];
@@ -210,8 +210,11 @@ function BoardComponent() {
       updatedOverCards.splice(insertIndex, 0, movedCard);
 
       // Update card order in both columns
-      await updateCardOrder(updatedActiveCards, activeColumn.id.toString());
-      await updateCardOrder(updatedOverCards, overColumn.id.toString());
+      await handleUpdateCardOrder(
+        updatedActiveCards,
+        activeColumn.id.toString()
+      );
+      await handleUpdateCardOrder(updatedOverCards, overColumn.id.toString());
     }
 
     // Invalidate to refresh the data
