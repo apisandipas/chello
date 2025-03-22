@@ -1,9 +1,9 @@
+import type { User } from '@prisma/client';
 import { createServerFn } from '@tanstack/react-start';
 import * as argon2 from 'argon2';
-import prisma from '../db-client';
-import type { User } from '@prisma/client';
 import { z } from 'zod';
-import { generateToken } from '../utils/jwt';
+import prisma from '../db-client';
+import { useAppSession } from '../utils/use-app-session';
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -38,36 +38,22 @@ export const signup = createServerFn({
   method: 'POST',
 })
   .validator((data) => {
-    console.log('[Signup Validator] Received input:', data);
     const validated = signupSchema.safeParse(data);
     if (!validated.success) {
       console.error('[Signup Validator] Validation failed:', validated.error);
       throw new Error('Invalid data');
     }
-    console.log('[Signup Validator] Validated data:', validated.data);
     return validated.data;
   })
   .handler(async ({ data }) => {
     try {
-      console.log('[Signup Handler] Processing data:', data);
-      console.log('[Signup Handler] Prisma instance:', { 
-        prismaExists: !!prisma,
-        models: Object.keys(prisma),
-        userModel: !!prisma.user,
-        modelMethods: Object.keys(prisma.user || {}),
-      });
-      
-      // Check if user already exists
-      console.log('[Signup Handler] Checking for existing user with email:', data.email);
       const existingUser = await prisma.user.findUnique({
         where: { email: data.email },
       }).catch(err => {
-        console.error('[Signup Handler] Error checking existing user:', err);
         throw err;
       });
 
       if (existingUser) {
-        console.log('[Signup Handler] User already exists');
         return {
           user: null,
           token: null,
@@ -76,35 +62,35 @@ export const signup = createServerFn({
       }
 
       // Hash password with Argon2
-      console.log('[Signup Handler] Hashing password');
       const hashedPassword = await argon2.hash(data.password).catch(err => {
-        console.error('[Signup Handler] Error hashing password:', err);
         throw err;
       });
-      
+
       // Create user in database
-      console.log('[Signup Handler] Creating new user');
       const user = await prisma.user.create({
         data: {
           email: data.email,
           password: hashedPassword,
         },
       }).catch(err => {
-        console.error('[Signup Handler] Error creating user:', err);
         throw err;
       });
 
-      const { password, ...userWithoutPassword } = user;
-      const token = generateToken(user);
-      
-      console.log('[Signup Handler] User created successfully:', { userId: user.id, email: user.email });
+      const session = await useAppSession();
+
+      await session.update({
+        email: user.email,
+        id: user.id,
+      });
+
       return {
-        user: userWithoutPassword,
-        token,
-        error: null,
+        error: false,
+        userNotFound: false,
+        message: 'Account created',
       };
+
+
     } catch (error) {
-      console.error('[Signup Handler] Error:', error);
       return {
         user: null,
         token: null,
@@ -123,10 +109,14 @@ export const login = createServerFn({
     }
     return validated.data;
   })
-  .handler(async ({ data  }) => {
+  .handler(async ({ data, signal, ...ctx }) => {
     try {
       const user = await prisma.user.findUnique({
-        where: { email: data.email },
+        where: { email: data.email }, select: {
+          id: true,
+          email: true,
+          password: true,
+        },
       });
 
       if (!user) {
@@ -140,6 +130,7 @@ export const login = createServerFn({
       const isValidPassword = await argon2.verify(user.password, data.password);
 
       if (!isValidPassword) {
+        console.error('[Login] Invalid credentials');
         return {
           user: null,
           token: null,
@@ -147,15 +138,34 @@ export const login = createServerFn({
         };
       }
 
-      const { password, ...userWithoutPassword } = user;
-      const token = generateToken(user);
+      // Create a session
+      const session = await useAppSession();
+
+      // Store the user's email in the session
+      await session.update({
+        email: user.email,
+        id: user.id,
+      });
 
       return {
-        user: userWithoutPassword,
-        token,
-        error: null,
-      };
+        error: false,
+        userNotFound: false,
+        message: 'Logged in',
+      }
+
+      // const { password, ...userWithoutPassword } = user;
+
+      // const token = generateToken(user);
+      // setCookie(TOKEN_KEY, token);
+      // setCookie(USER_KEY, JSON.stringify(userWithoutPassword));
+
+      // return {
+      //   user: userWithoutPassword,
+      //   token,
+      //   error: null,
+      // };
     } catch (error) {
+      console.error('[Login] Error:', error);
       return {
         user: null,
         token: null,
@@ -163,6 +173,41 @@ export const login = createServerFn({
       };
     }
   });
+
+export const fetchSessionUser = createServerFn().handler(async () => {
+  // We need to auth on the server so we have access to secure cookies
+  const session = await useAppSession();
+
+  if (!session.data.email) {
+    return null;
+  }
+
+  return {
+    ...session.data,
+  };
+});
+
+
+export const getCurrentUser = createServerFn().handler(async () => {
+  const session = await useAppSession();
+
+  if (!session.data.email) {
+    throw new Error('Not authenticated');
+  }
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: session.data.email,
+    },
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+
+  return user;
+});
+
 
 export const resetPassword = createServerFn({
   method: 'POST',
@@ -191,7 +236,7 @@ export const resetPassword = createServerFn({
       // 1. Generate a reset token
       // 2. Save it to the database with an expiration
       // 3. Send an email with a reset link
-      
+
       return {
         success: true,
         error: null,

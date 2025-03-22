@@ -6,13 +6,23 @@ import {
   Scripts,
   useRouter,
 } from "@tanstack/react-router";
-import { Toaster } from "~/components/ui/sonner";
 import { ReactNode } from "react";
-import appCss from "../index.css?url";
 import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
-import { SessionProvider } from "~/lib/hooks/session/session-provider";
+import { Toaster } from "~/components/ui/sonner";
+import { fetchSessionUser } from "~/lib/services/auth";
+import appCss from "../index.css?url";
 
 export const Route = createRootRoute({
+  notFoundComponent: () => <div>Not Found</div>,
+  beforeLoad: async () => {
+    // get the user from the session and add to context
+    const user = await fetchSessionUser();
+
+    console.log("root- beforeLoas - user", user);
+    return {
+      user,
+    };
+  },
   head: () => ({
     meta: [
       {
@@ -31,7 +41,7 @@ export const Route = createRootRoute({
       },
       {
         name: "og:image",
-        content: "/chell.svg",
+        content: "/chello.svg",
       },
       {
         name: "og:title",
@@ -43,7 +53,7 @@ export const Route = createRootRoute({
       },
       {
         name: "og:image",
-        content: "/chell.svg",
+        content: "/chello.svg",
       },
       {
         name: "og:image:width",
@@ -56,7 +66,7 @@ export const Route = createRootRoute({
 
     ],
     links: [
-      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: appCss }, { rel: 'icon', href: '/favicon.ico' },
     ],
   }),
   component: RootComponent,
@@ -64,17 +74,14 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    // <SessionProvider>
-      <RootDocument>
-        <Outlet />
-      </RootDocument>
-    // </SessionProvider>
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
   );
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
-  const isAuthRoute = router.state.location.pathname.startsWith('/auth');
 
   return (
     <html>
@@ -82,31 +89,35 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        {!isAuthRoute && (
-          <>
-            <div className="p-2 flex gap-3 items-center">
-              <Link to="/" className="[&.active]:font-bold ">
-                <img src="/chell.svg" alt="Chello" className="w-6 h-6" />
-              </Link>
-              <Link to="/about" className="[&.active]:font-bold">
-                About
-              </Link>
-              <Link to="/boards" className="[&.active]:font-bold">
-                Boards
-              </Link>
+        <>
+          <div className="p-2 flex gap-3 items-center">
+            <Link to="/" className="[&.active]:font-bold ">
+              <img src="/chello.svg" alt="Chello" title="Chello" className="w-6 h-6" />
+            </Link>
+            <Link to="/about" className="[&.active]:font-bold">
+              About
+            </Link>
+            <Link to="/boards" className="[&.active]:font-bold">
+              Boards
+            </Link>
+            <>
               <Link to="/auth/login" className="[&.active]:font-bold">
                 Login
               </Link>
               <Link to="/auth/signup" className="[&.active]:font-bold">
                 Signup
               </Link>
-              <div className="ml-auto">
-                <CreateBoardButton />
-              </div>
+            </>
+
+            <Link to="/auth/logout" className="[&.active]:font-bold">
+              Logout
+            </Link>
+            <div className="ml-auto">
+              <CreateBoardButton />
             </div>
-            <hr />
-          </>
-        )}
+          </div>
+          <hr />
+        </>
         {children}
         <Scripts />
         <Toaster />

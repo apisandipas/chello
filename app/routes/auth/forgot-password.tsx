@@ -48,7 +48,7 @@ function RouteComponent() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <img src="/chell.svg" alt="Chello" className="w-6 h-6 mr-2" />
+          <img src="/chello.svg" alt="Chello" className="w-6 h-6 mr-2" />
           Chello
         </div>
         <div className="relative z-20 mt-auto">

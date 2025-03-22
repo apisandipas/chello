@@ -1,6 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { getBoardsFn } from "~/lib/services/boards";
 import type { Board } from "@prisma/client";
+import { getCurrentUser } from "~/lib/services/auth";
+import { Button } from "~/components/ui/button";
+import { PlusCircle } from "lucide-react";
+import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
 
 type BoardWithCounts = Board & {
   _count: {
@@ -11,14 +15,56 @@ type BoardWithCounts = Board & {
 
 export const Route = createFileRoute("/boards")({
   component: RouteComponent,
+  beforeLoad: ({ context }: { context: { user?: unknown } }) => {
+    console.log('boards route - beforeload', { context })
+    if (!context.user) {
+      // Redirect to the home page if the user is not authenticated
+      return redirect({
+        to: '/auth/login',
+        statusCode: 301,
+      });
+
+    }
+    return {
+      user: context.user,
+    }
+  },
   loader: async () => {
-    const boards = await getBoardsFn();
+    const user = await getCurrentUser();
+    if (!user) {
+      await redirect({
+        to: '/auth/login',
+        statusCode: 301,
+      });
+      return { boards: [] }
+    }
+    const boards = await getBoardsFn({ data: { userId: user.id } });
     return { boards };
   },
 });
 
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center p-4">
+      <div className="mb-6">
+        <img src="/chello.svg" alt="Chello" className="w-16 h-16 mx-auto" />
+      </div>
+      <h2 className="text-2xl font-bold mb-2">No boards yet</h2>
+      <p className="text-gray-600 mb-6 max-w-md">
+        Get started by creating your first board. Boards help you organize your work and collaborate with others.
+      </p>
+      <CreateBoardButton />
+    </div>
+  );
+}
+
 function RouteComponent() {
   const { boards } = Route.useLoaderData();
+
+  if (!boards || boards.length === 0) {
+    return <EmptyState />;
+  }
+
   return (
     <div className="relative min-h-screen bg-gray-100">
       <div className="p-4">

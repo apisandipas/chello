@@ -1,10 +1,9 @@
 import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { useRef, useState } from "react"
+import { toast } from 'sonner'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { useState, useRef } from "react"
 import { login as loginServerFn } from '~/lib/services/auth'
-import { toast } from 'sonner'
-import { useSession } from '~/lib/hooks/session/use-session'
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
@@ -14,7 +13,6 @@ function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
-  const { login } = useSession()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -32,10 +30,7 @@ function RouteComponent() {
         return
       }
 
-      // Set the client session
-      await login(result.token, result.user)
-
-      toast.success('Successfully logged in!')
+      toast.success(result.message)
       formRef.current?.reset()
       router.navigate({ to: '/boards' })
     } catch (error) {
@@ -54,7 +49,7 @@ function RouteComponent() {
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <img src="/chell.svg" alt="Chello" className="w-6 h-6 mr-2" />
+          <img src="/chello.svg" alt="Chello" className="w-6 h-6 mr-2" />
           Chello
         </div>
         <div className="relative z-20 mt-auto">

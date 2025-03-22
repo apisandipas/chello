@@ -16,6 +16,7 @@ import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
 import { Route as AuthSignupImport } from './routes/auth/signup'
+import { Route as AuthLogoutImport } from './routes/auth/logout'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordImport } from './routes/auth/forgot-password'
 import { Route as BoardBoardIdCardCardIdImport } from './routes/board/$boardId/card/$cardId'
@@ -49,6 +50,12 @@ const BoardBoardIdRoute = BoardBoardIdImport.update({
 const AuthSignupRoute = AuthSignupImport.update({
   id: '/auth/signup',
   path: '/auth/signup',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AuthLogoutRoute = AuthLogoutImport.update({
+  id: '/auth/logout',
+  path: '/auth/logout',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -109,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginImport
       parentRoute: typeof rootRoute
     }
+    '/auth/logout': {
+      id: '/auth/logout'
+      path: '/auth/logout'
+      fullPath: '/auth/logout'
+      preLoaderRoute: typeof AuthLogoutImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/signup': {
       id: '/auth/signup'
       path: '/auth/signup'
@@ -153,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
@@ -164,6 +179,7 @@ export interface FileRoutesByTo {
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
@@ -176,6 +192,7 @@ export interface FileRoutesById {
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
+  '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
@@ -189,6 +206,7 @@ export interface FileRouteTypes {
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
     | '/board/$boardId/card/$cardId'
@@ -199,6 +217,7 @@ export interface FileRouteTypes {
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
     | '/board/$boardId/card/$cardId'
@@ -209,6 +228,7 @@ export interface FileRouteTypes {
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
+    | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
     | '/board/$boardId/card/$cardId'
@@ -221,6 +241,7 @@ export interface RootRouteChildren {
   BoardsRoute: typeof BoardsRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthLogoutRoute: typeof AuthLogoutRoute
   AuthSignupRoute: typeof AuthSignupRoute
   BoardBoardIdRoute: typeof BoardBoardIdRouteWithChildren
 }
@@ -231,6 +252,7 @@ const rootRouteChildren: RootRouteChildren = {
   BoardsRoute: BoardsRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthLogoutRoute: AuthLogoutRoute,
   AuthSignupRoute: AuthSignupRoute,
   BoardBoardIdRoute: BoardBoardIdRouteWithChildren,
 }
@@ -250,6 +272,7 @@ export const routeTree = rootRoute
         "/boards",
         "/auth/forgot-password",
         "/auth/login",
+        "/auth/logout",
         "/auth/signup",
         "/board/$boardId"
       ]
@@ -268,6 +291,9 @@ export const routeTree = rootRoute
     },
     "/auth/login": {
       "filePath": "auth/login.tsx"
+    },
+    "/auth/logout": {
+      "filePath": "auth/logout.tsx"
     },
     "/auth/signup": {
       "filePath": "auth/signup.tsx"

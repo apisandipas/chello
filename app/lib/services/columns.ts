@@ -1,6 +1,7 @@
 import { z } from "zod";
 import prisma from "../db-client";
 import { createServerFn } from "@tanstack/react-start";
+import { useAppSession } from "~/lib/utils/use-app-session";
 
 export const createColumnFn = createServerFn({
   method: "POST",
@@ -16,11 +17,30 @@ export const createColumnFn = createServerFn({
   })
   .handler(async ({ data }) => {
     try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+
+      // Verify the board belongs to the user
+      const board = await prisma.board.findUnique({
+        where: { id: data.boardId, userId: session.data.id },
+      });
+
+      if (!board) {
+        throw new Error("Board not found");
+      }
+
       const count = await prisma.column.count({
         where: { boardId: data.boardId },
       });
       const column = await prisma.column.create({
-        data: { name: data.name, boardId: data.boardId, sortOrder: count },
+        data: {
+          name: data.name,
+          boardId: data.boardId,
+          sortOrder: count,
+          userId: session.data.id
+        },
       });
       return { column };
     } catch (error) {
@@ -41,8 +61,13 @@ export const archiveColumnFn = createServerFn({
   })
   .handler(async ({ data }) => {
     try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+
       const column = await prisma.column.update({
-        where: { id: data.columnId },
+        where: { id: data.columnId, userId: session.data.id },
         data: { isArchived: true },
       });
       return { column };
@@ -66,8 +91,13 @@ export const updateColumnFn = createServerFn({
   })
   .handler(async ({ data }) => {
     try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+
       const column = await prisma.column.update({
-        where: { id: data.columnId },
+        where: { id: data.columnId, userId: session.data.id },
         data: { name: data.name },
       });
       return { column };

@@ -12,7 +12,7 @@ export const CreateBoardButton = () => {
 
   const handleCreateBoard = async () => {
     if (!boardName.trim()) return;
-    
+
     const { id } = await createBoardFn({ data: { name: boardName } });
     setBoardName("");
     setIsOpen(false);
@@ -22,7 +22,7 @@ export const CreateBoardButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-blue-500 hover:bg-blue-700">Create Board</Button>
+        <Button className="bg-cyan-700 hover:bg-cyan-800">Create Board</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -41,7 +41,7 @@ export const CreateBoardButton = () => {
           />
         </div>
         <DialogFooter>
-          <Button onClick={handleCreateBoard} disabled={!boardName.trim()} className="bg-blue-500 hover:bg-blue-700">
+          <Button onClick={handleCreateBoard} disabled={!boardName.trim()} className="bg-cyan-700 hover:bg-syan-800">
             Create
           </Button>
         </DialogFooter>

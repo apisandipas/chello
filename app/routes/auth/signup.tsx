@@ -19,33 +19,27 @@ function RouteComponent() {
     setIsLoading(true)
 
     try {
-      console.log('[Signup Form] Form submission started');
       const formData = new FormData(e.currentTarget)
       const email = formData.get('email') as string
       const password = formData.get('password') as string
-      
-      console.log('[Signup Form] Calling signup function with email:', email);
+
       const result = await signup({ data: { email, password } })
 
       if (result.error) {
-        console.log('[Signup Form] Signup failed with error:', result.error);
         toast.error(result.error)
         return
       }
 
-      console.log('[Signup Form] Signup successful, redirecting to login');
       toast.success('Successfully signed up! Please log in.')
       formRef.current?.reset()
       router.navigate({ to: '/auth/login' })
     } catch (error) {
-      console.error('[Signup Form] Unexpected error:', error);
       if (error instanceof Error) {
         toast.error(error.message)
       } else {
         toast.error('An unexpected error occurred')
       }
     } finally {
-      console.log('[Signup Form] Form submission completed');
       setIsLoading(false)
     }
   }
@@ -53,9 +47,9 @@ function RouteComponent() {
   return (
     <div className="container relative h-[100vh] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
-        <div className="absolute inset-0 bg-primary" />
+        <div className="absolute inset-0 bg-cyan-700" />
         <div className="relative z-20 flex items-center text-lg font-medium">
-          <img src="/chell.svg" alt="Chello" className="w-6 h-6 mr-2" />
+          <img src="/chello.svg" alt="Chello" className="w-6 h-6 mr-2" />
           Chello
         </div>
         <div className="relative z-20 mt-auto">
@@ -95,8 +89,8 @@ function RouteComponent() {
             </div>
             <Button
               type="submit"
-              className="w-full"
               disabled={isLoading}
+              className=" w-full bg-cyan-700 hover:bg-cyan-800"
             >
               {isLoading ? "Creating account..." : "Sign up"}
             </Button>
