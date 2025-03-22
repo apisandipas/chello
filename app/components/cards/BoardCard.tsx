@@ -1,7 +1,12 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { Link, useParams, useRouter } from "@tanstack/react-router";
+import { useState } from "react";
 import type { Card } from "../../types";
-import { Link, useParams } from "@tanstack/react-router";
+import { CardMenu } from "./CardMenu";
+import { archiveCardFn, updateCardFn } from "../../lib/services/cards";
+import { toast } from "sonner";
+import { CardContent } from "./CardContent";
 
 interface BoardCardProps {
   card: Card;
@@ -9,6 +14,9 @@ interface BoardCardProps {
 }
 
 export function BoardCard({ card, enableDragAndDrop = false }: BoardCardProps) {
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const { boardId } = useParams({ from: "/board/$boardId" });
   const {
     attributes,
@@ -17,12 +25,27 @@ export function BoardCard({ card, enableDragAndDrop = false }: BoardCardProps) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: card.id, disabled: !enableDragAndDrop });
+  } = useSortable({
+    id: card.id,
+    disabled: !enableDragAndDrop || isEditing,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
+  };
+
+  const handleUpdateCard = async (cardId: string, name: string) => {
+    await updateCardFn({ data: { id: cardId, name } });
+    await router.invalidate();
+    toast.success("Card updated");
+  };
+
+  const handleArchiveCard = async (cardId: string) => {
+    await archiveCardFn({ data: { id: cardId } });
+    await router.invalidate();
+    toast.success("Card archived");
   };
 
   return (
@@ -33,11 +56,29 @@ export function BoardCard({ card, enableDragAndDrop = false }: BoardCardProps) {
       <div
         ref={setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
-        className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow"
+        {...(isEditing ? {} : { ...attributes, ...listeners })}
+        className="bg-white p-3 rounded-lg shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow relative group"
       >
-        <h3 className="font-medium text-gray-900">{card.name}</h3>
+        <CardContent
+          card={card}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+          persistEdit={handleUpdateCard}
+        />
+        <div
+          className={`absolute top-2 right-2 transition-opacity ${isMenuOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+        >
+          <CardMenu
+            onOpenChange={setIsMenuOpen}
+            setIsEditing={setIsEditing}
+            onArchive={handleArchiveCard}
+            cardId={card.id}
+          />
+        </div>
       </div>
     </Link>
   );

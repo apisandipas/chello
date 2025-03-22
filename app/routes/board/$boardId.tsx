@@ -144,11 +144,13 @@ function BoardComponent() {
           (col) => col.id === over.id
         );
 
-        const newColumns = arrayMove(boardData.columns, oldIndex, newIndex);
+        // Update the local state immediately
+        boardData.columns = arrayMove(boardData.columns, oldIndex, newIndex);
 
-        // Update the sort order in the database
-        await handleUpdateColumnOrder(newColumns);
-        await router.invalidate();
+        // Update the sort order in the database in the background
+        handleUpdateColumnOrder(boardData.columns).then(() => {
+          router.invalidate();
+        });
       }
     }
 
@@ -195,8 +197,12 @@ function BoardComponent() {
         activeCardIndex,
         overCardIndex
       );
-      // Update card order in the database
-      await handleUpdateCardOrder(newCards, activeColumn.id.toString());
+      // Update local state immediately
+      activeColumn.cards = newCards;
+      // Update card order in the database in the background
+      handleUpdateCardOrder(newCards, activeColumn.id.toString()).then(() => {
+        router.invalidate();
+      });
     } else {
       // Different column
       const updatedActiveCards = [...activeColumn.cards];
@@ -209,16 +215,18 @@ function BoardComponent() {
 
       updatedOverCards.splice(insertIndex, 0, movedCard);
 
-      // Update card order in both columns
-      await handleUpdateCardOrder(
-        updatedActiveCards,
-        activeColumn.id.toString()
-      );
-      await handleUpdateCardOrder(updatedOverCards, overColumn.id.toString());
-    }
+      // Update local state immediately
+      activeColumn.cards = updatedActiveCards;
+      overColumn.cards = updatedOverCards;
 
-    // Invalidate to refresh the data
-    await router.invalidate();
+      // Update card order in both columns in the background
+      Promise.all([
+        handleUpdateCardOrder(updatedActiveCards, activeColumn.id.toString()),
+        handleUpdateCardOrder(updatedOverCards, overColumn.id.toString()),
+      ]).then(() => {
+        router.invalidate();
+      });
+    }
   };
 
   const renderBoard = () => (
@@ -233,7 +241,6 @@ function BoardComponent() {
       <AddAnotherColumn boardId={boardData.id} />
     </div>
   );
-
   return (
     <div className="relative h-screen bg-gray-100 w-full overflow-hidden">
       <div className="p-4 h-full overflow-x-auto">

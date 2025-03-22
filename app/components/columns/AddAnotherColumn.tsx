@@ -63,10 +63,10 @@ export function AddAnotherColumn({ boardId }: { boardId: string }) {
         </div>
       ) : (
         <div
-          className="flex px-4 py-2 rounded-lg  cursor-pointer  hover:bg-gray-100 min-w-80 hover:bg-gray-200"
+          className="flex px-4 py-2 rounded-lg  cursor-pointer bg-gray-200 hover:bg-gray-300 min-w-80 "
           onClick={() => setIsAdding(true)}
         >
-          + Add Another Column
+          + Add Column
         </div>
       )}
     </>

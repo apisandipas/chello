@@ -28,6 +28,9 @@ export const getBoardFn = createServerFn({
               orderBy: {
                 sortOrder: "asc",
               },
+              where: {
+                isArchived: false,
+              },
             },
           },
         },
@@ -110,8 +113,35 @@ export const updateCardOrderFn = createServerFn({
 export const getBoardsFn = createServerFn({
   method: "GET",
 }).handler(async () => {
-  const boards = await prisma.board.findMany();
-  return boards;
+  const boards = await prisma.board.findMany({
+    include: {
+      columns: {
+        where: {
+          isArchived: false,
+        },
+        include: {
+          _count: {
+            select: {
+              cards: {
+                where: {
+                  isArchived: false,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Transform the data to include total counts
+  return boards.map(board => ({
+    ...board,
+    _count: {
+      columns: board.columns.length,
+      cards: board.columns.reduce((total, column) => total + column._count.cards, 0),
+    },
+  }));
 });
 
 export const createBoardFn = createServerFn({

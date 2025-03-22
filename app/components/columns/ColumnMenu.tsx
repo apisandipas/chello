@@ -1,4 +1,6 @@
-import { Ellipsis } from "lucide-react";
+import { useRouter } from "@tanstack/react-router";
+import { MoreHorizontal } from "lucide-react";
+import { toast } from "sonner";
 import { archiveColumnFn } from "~/lib/services/columns";
 import {
   DropdownMenu,
@@ -8,8 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import { useRouter } from "@tanstack/react-router";
-import { toast } from "sonner";
 
 export function ColumnMenu({ columnId }: { columnId: string }) {
   const router = useRouter();
@@ -23,7 +23,7 @@ export function ColumnMenu({ columnId }: { columnId: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
-        <Ellipsis className="w-4 h-4 cursor-pointer" />
+        <MoreHorizontal className="w-4 h-4 cursor-pointer" />
       </DropdownMenuTrigger>
       <DropdownMenuContent data-side="left" data-align="end">
         <DropdownMenuLabel>Column Actions</DropdownMenuLabel>

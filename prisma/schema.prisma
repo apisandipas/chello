@@ -45,3 +45,11 @@ model Card {
   columnId   String
   columns    Column   @relation(fields: [columnId], references: [id])
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
