@@ -2,8 +2,9 @@ import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { useState, useRef } from "react"
-import { login } from '~/lib/services/auth'
+import { login as loginServerFn } from '~/lib/services/auth'
 import { toast } from 'sonner'
+import { useSession } from '~/lib/hooks/session/use-session'
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
@@ -13,6 +14,7 @@ function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const router = useRouter()
+  const { login } = useSession()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -23,12 +25,15 @@ function RouteComponent() {
       const email = formData.get('email') as string
       const password = formData.get('password') as string
 
-      const result = await login({ data: { email, password } })
+      const result = await loginServerFn({ data: { email, password } })
 
       if (result.error) {
         toast.error(result.error)
         return
       }
+
+      // Set the client session
+      await login(result.token, result.user)
 
       toast.success('Successfully logged in!')
       formRef.current?.reset()

@@ -3,6 +3,7 @@ import * as argon2 from 'argon2';
 import prisma from '../db-client';
 import type { User } from '@prisma/client';
 import { z } from 'zod';
+import { generateToken } from '../utils/jwt';
 
 const signupSchema = z.object({
   email: z.string().email(),
@@ -23,7 +24,8 @@ export type LoginInput = z.infer<typeof loginSchema>;
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
 export interface AuthResponse {
-  user: User | null;
+  user: Omit<User, 'password'> | null;
+  token: string | null;
   error: string | null;
 }
 
@@ -68,6 +70,7 @@ export const signup = createServerFn({
         console.log('[Signup Handler] User already exists');
         return {
           user: null,
+          token: null,
           error: 'Email already in use',
         };
       }
@@ -92,16 +95,19 @@ export const signup = createServerFn({
       });
 
       const { password, ...userWithoutPassword } = user;
+      const token = generateToken(user);
       
       console.log('[Signup Handler] User created successfully:', { userId: user.id, email: user.email });
       return {
         user: userWithoutPassword,
+        token,
         error: null,
       };
     } catch (error) {
       console.error('[Signup Handler] Error:', error);
       return {
         user: null,
+        token: null,
         error: 'Failed to create account',
       };
     }
@@ -126,6 +132,7 @@ export const login = createServerFn({
       if (!user) {
         return {
           user: null,
+          token: null,
           error: 'Invalid credentials',
         };
       }
@@ -135,17 +142,23 @@ export const login = createServerFn({
       if (!isValidPassword) {
         return {
           user: null,
+          token: null,
           error: 'Invalid credentials',
         };
       }
 
+      const { password, ...userWithoutPassword } = user;
+      const token = generateToken(user);
+
       return {
-        user,
+        user: userWithoutPassword,
+        token,
         error: null,
       };
     } catch (error) {
       return {
         user: null,
+        token: null,
         error: 'Failed to log in',
       };
     }

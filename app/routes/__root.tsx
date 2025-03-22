@@ -10,6 +10,7 @@ import { Toaster } from "~/components/ui/sonner";
 import { ReactNode } from "react";
 import appCss from "../index.css?url";
 import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
+import { SessionProvider } from "~/lib/hooks/session/session-provider";
 
 export const Route = createRootRoute({
   head: () => ({
@@ -63,9 +64,11 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <RootDocument>
-      <Outlet />
-    </RootDocument>
+    // <SessionProvider>
+      <RootDocument>
+        <Outlet />
+      </RootDocument>
+    // </SessionProvider>
   );
 }
 
