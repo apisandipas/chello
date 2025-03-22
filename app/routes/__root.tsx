@@ -71,33 +71,39 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
+  const isAuthRoute = router.state.location.pathname.startsWith('/auth');
+
   return (
     <html>
       <head>
         <HeadContent />
       </head>
       <body>
-        <div className="p-2 flex gap-3 items-center">
-          <Link to="/" className="[&.active]:font-bold ">
-            <img src="/chell.svg" alt="Chello" className="w-6 h-6" />
-          </Link>
-          <Link to="/about" className="[&.active]:font-bold">
-            About
-          </Link>
-          <Link to="/boards" className="[&.active]:font-bold">
-            Boards
-          </Link>
-          <Link to="/auth/login" className="[&.active]:font-bold">
-            Login
-          </Link>
-          <Link to="/auth/signup" className="[&.active]:font-bold">
-            Signup
-          </Link>
-          <div className="ml-auto">
-            <CreateBoardButton />
-          </div>
-        </div>
-        <hr />
+        {!isAuthRoute && (
+          <>
+            <div className="p-2 flex gap-3 items-center">
+              <Link to="/" className="[&.active]:font-bold ">
+                <img src="/chell.svg" alt="Chello" className="w-6 h-6" />
+              </Link>
+              <Link to="/about" className="[&.active]:font-bold">
+                About
+              </Link>
+              <Link to="/boards" className="[&.active]:font-bold">
+                Boards
+              </Link>
+              <Link to="/auth/login" className="[&.active]:font-bold">
+                Login
+              </Link>
+              <Link to="/auth/signup" className="[&.active]:font-bold">
+                Signup
+              </Link>
+              <div className="ml-auto">
+                <CreateBoardButton />
+              </div>
+            </div>
+            <hr />
+          </>
+        )}
         {children}
         <Scripts />
         <Toaster />

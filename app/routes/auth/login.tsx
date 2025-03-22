@@ -1,7 +1,9 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { useState } from "react"
+import { useState, useRef } from "react"
+import { login } from '~/lib/services/auth'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/auth/login')({
   component: RouteComponent,
@@ -9,16 +11,41 @@ export const Route = createFileRoute('/auth/login')({
 
 function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    // TODO: Implement login logic
-    setIsLoading(false)
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+
+      const result = await login({ data: { email, password } })
+
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+
+      toast.success('Successfully logged in!')
+      formRef.current?.reset()
+      router.navigate({ to: '/boards' })
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('An unexpected error occurred')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="container relative h-[calc(100vh-52px)] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container relative h-[100vh] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
@@ -41,9 +68,10 @@ function RouteComponent() {
               Enter your credentials to access your account
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Input
+                name="email"
                 type="email"
                 placeholder="Email"
                 required
@@ -52,6 +80,7 @@ function RouteComponent() {
             </div>
             <div className="space-y-2">
               <Input
+                name="password"
                 type="password"
                 placeholder="Password"
                 required

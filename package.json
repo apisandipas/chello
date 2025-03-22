@@ -23,6 +23,7 @@
     "@tanstack/react-router": "^1.114.3",
     "@tanstack/react-start": "^1.114.3",
     "@types/autoprefixer": "^10.2.4",
+    "argon2": "^0.41.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.479.0",

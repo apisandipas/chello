@@ -1,24 +1,57 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { useState } from "react"
+import { useState, useRef } from "react"
+import { signup } from '~/lib/services/auth'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/auth/signup')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    // TODO: Implement signup logic
-    setIsLoading(false)
+
+    try {
+      console.log('[Signup Form] Form submission started');
+      const formData = new FormData(e.currentTarget)
+      const email = formData.get('email') as string
+      const password = formData.get('password') as string
+      
+      console.log('[Signup Form] Calling signup function with email:', email);
+      const result = await signup({ data: { email, password } })
+
+      if (result.error) {
+        console.log('[Signup Form] Signup failed with error:', result.error);
+        toast.error(result.error)
+        return
+      }
+
+      console.log('[Signup Form] Signup successful, redirecting to login');
+      toast.success('Successfully signed up! Please log in.')
+      formRef.current?.reset()
+      router.navigate({ to: '/auth/login' })
+    } catch (error) {
+      console.error('[Signup Form] Unexpected error:', error);
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('An unexpected error occurred')
+      }
+    } finally {
+      console.log('[Signup Form] Form submission completed');
+      setIsLoading(false)
+    }
   }
 
   return (
-    <div className="container relative h-[calc(100vh-52px)] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container relative h-[100vh] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
@@ -41,17 +74,10 @@ function RouteComponent() {
               Enter your details below to create your account
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Input
-                type="text"
-                placeholder="Name"
-                required
-                disabled={isLoading}
-              />
-            </div>
-            <div className="space-y-2">
-              <Input
+                name="email"
                 type="email"
                 placeholder="Email"
                 required
@@ -60,6 +86,7 @@ function RouteComponent() {
             </div>
             <div className="space-y-2">
               <Input
+                name="password"
                 type="password"
                 placeholder="Password"
                 required

@@ -24,3 +24,34 @@ export interface Board {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface User {
+  id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface AuthResponse {
+  user: User | null;
+  error: string | null;
+}
+
+export interface SignupPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface ResetPasswordPayload {
+  email: string;
+}
+
+export interface PasswordResetResponse {
+  success: boolean;
+  error: string | null;
+}

@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
-import { useState } from "react"
+import { useState, useRef } from "react"
+import { resetPassword } from '~/lib/services/auth'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/auth/forgot-password')({
   component: RouteComponent,
@@ -10,20 +12,39 @@ export const Route = createFileRoute('/auth/forgot-password')({
 function RouteComponent() {
   const [isLoading, setIsLoading] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    // TODO: Implement password reset logic
-    // Simulate email sent for now
-    setTimeout(() => {
+
+    try {
+      const formData = new FormData(e.currentTarget)
+      const email = formData.get('email') as string
+
+      const result = await resetPassword({ data: { email } })
+
+      if (result.error) {
+        toast.error(result.error)
+        return
+      }
+
+      toast.success('Password reset instructions sent to your email!')
+      formRef.current?.reset()
       setEmailSent(true)
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error('An unexpected error occurred')
+      }
+    } finally {
       setIsLoading(false)
-    }, 1000)
+    }
   }
 
   return (
-    <div className="container relative h-[calc(100vh-52px)] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+    <div className="container relative h-[100vh] flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
       <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
         <div className="absolute inset-0 bg-primary" />
         <div className="relative z-20 flex items-center text-lg font-medium">
@@ -49,9 +70,10 @@ function RouteComponent() {
             </p>
           </div>
           {!emailSent ? (
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Input
+                  name="email"
                   type="email"
                   placeholder="Email"
                   required
