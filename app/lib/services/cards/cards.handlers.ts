@@ -1,6 +1,6 @@
 "use server";
 import prisma from "../../db-client";
-import { useAppSession } from "~/lib/utils/use-app-session";
+import { useAppSession } from "../../utils/use-app-session";
 
 export const createCardHandler = async ({ data }) => {
   try {
@@ -74,10 +74,8 @@ export const archiveCardHandler = async ({ data }) => {
 };
 
 export const getCardHandler = async ({ data }) => {
-  console.log('[Get Card] Data:', data);
   try {
     const session = await useAppSession();
-    console.log('[Get Card] Session:', session);
     if (!session.data || !session.data.id) {
       throw new Error("User not found");
     }

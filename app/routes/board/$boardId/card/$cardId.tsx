@@ -7,11 +7,8 @@ export const Route = createFileRoute("/board/$boardId/card/$cardId")({
   component: RouteComponent,
   errorComponent: CardErrorComponent,
   loader: async ({ params, context }) => {
-    console.log('[Route] Params:', params);
-    console.log('[Route] Context:', context);
-    const { card } = await getCardFn({ data: { id: params.cardId } });
-    console.log('[Route] Card:', card);
-    return { card: card, boardId: params.boardId };
+    const data = await getCardFn({ data: { id: params.cardId } });
+    return { card: data.card, boardId: params.boardId };
   }
 
 });
