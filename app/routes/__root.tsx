@@ -4,6 +4,7 @@ import {
   Link,
   Outlet,
   Scripts,
+  useMatch,
   useRouter,
 } from "@tanstack/react-router";
 import { ReactNode } from "react";
@@ -80,14 +81,18 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const ctx = Route.useRouteContext();
+  const router = useRouter();
   const isAuthenticated = !!ctx.user;
+  const isDashboardRoute = router.state.location.pathname.startsWith('/admin');
+
+  console.log('isDashboardRoute', isDashboardRoute);
   return (
     <html>
       <head>
         <HeadContent />
       </head>
       <body>
-        <GlobalHeader isAuthenticated={isAuthenticated} ctx={ctx ?? { user: null }} />
+        {!isDashboardRoute && <GlobalHeader isAuthenticated={isAuthenticated} ctx={ctx ?? { user: null }} />}
         {children}
         <Scripts />
         <Toaster />

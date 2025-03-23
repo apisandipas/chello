@@ -13,18 +13,19 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as BoardsImport } from './routes/boards'
 import { Route as BoardImport } from './routes/board'
+import { Route as AdminImport } from './routes/admin'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as DashboardIndexImport } from './routes/dashboard/index'
-import { Route as DashboardUsersImport } from './routes/dashboard/users'
-import { Route as DashboardTeamsImport } from './routes/dashboard/teams'
-import { Route as DashboardSupportImport } from './routes/dashboard/support'
-import { Route as DashboardAccountingImport } from './routes/dashboard/accounting'
+import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
 import { Route as AuthSignupImport } from './routes/auth/signup'
 import { Route as AuthLogoutImport } from './routes/auth/logout'
 import { Route as AuthLoginImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordImport } from './routes/auth/forgot-password'
+import { Route as AdminUsersImport } from './routes/admin/users'
+import { Route as AdminTeamsImport } from './routes/admin/teams'
+import { Route as AdminSupportImport } from './routes/admin/support'
+import { Route as AdminAccountingImport } from './routes/admin/accounting'
 import { Route as BoardBoardIdCardCardIdImport } from './routes/board/$boardId/card/$cardId'
 
 // Create/Update Routes
@@ -41,6 +42,12 @@ const BoardRoute = BoardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminRoute = AdminImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
@@ -53,34 +60,10 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardIndexRoute = DashboardIndexImport.update({
-  id: '/dashboard/',
-  path: '/dashboard/',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardUsersRoute = DashboardUsersImport.update({
-  id: '/dashboard/users',
-  path: '/dashboard/users',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardTeamsRoute = DashboardTeamsImport.update({
-  id: '/dashboard/teams',
-  path: '/dashboard/teams',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardSupportRoute = DashboardSupportImport.update({
-  id: '/dashboard/support',
-  path: '/dashboard/support',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const DashboardAccountingRoute = DashboardAccountingImport.update({
-  id: '/dashboard/accounting',
-  path: '/dashboard/accounting',
-  getParentRoute: () => rootRoute,
+const AdminIndexRoute = AdminIndexImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 
 const BoardBoardIdRoute = BoardBoardIdImport.update({
@@ -113,6 +96,30 @@ const AuthForgotPasswordRoute = AuthForgotPasswordImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AdminUsersRoute = AdminUsersImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminTeamsRoute = AdminTeamsImport.update({
+  id: '/teams',
+  path: '/teams',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminSupportRoute = AdminSupportImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AdminRoute,
+} as any)
+
+const AdminAccountingRoute = AdminAccountingImport.update({
+  id: '/accounting',
+  path: '/accounting',
+  getParentRoute: () => AdminRoute,
+} as any)
+
 const BoardBoardIdCardCardIdRoute = BoardBoardIdCardCardIdImport.update({
   id: '/card/$cardId',
   path: '/card/$cardId',
@@ -137,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminImport
+      parentRoute: typeof rootRoute
+    }
     '/board': {
       id: '/board'
       path: '/board'
@@ -150,6 +164,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/boards'
       preLoaderRoute: typeof BoardsImport
       parentRoute: typeof rootRoute
+    }
+    '/admin/accounting': {
+      id: '/admin/accounting'
+      path: '/accounting'
+      fullPath: '/admin/accounting'
+      preLoaderRoute: typeof AdminAccountingImport
+      parentRoute: typeof AdminImport
+    }
+    '/admin/support': {
+      id: '/admin/support'
+      path: '/support'
+      fullPath: '/admin/support'
+      preLoaderRoute: typeof AdminSupportImport
+      parentRoute: typeof AdminImport
+    }
+    '/admin/teams': {
+      id: '/admin/teams'
+      path: '/teams'
+      fullPath: '/admin/teams'
+      preLoaderRoute: typeof AdminTeamsImport
+      parentRoute: typeof AdminImport
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersImport
+      parentRoute: typeof AdminImport
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
@@ -186,40 +228,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BoardBoardIdImport
       parentRoute: typeof BoardImport
     }
-    '/dashboard/accounting': {
-      id: '/dashboard/accounting'
-      path: '/dashboard/accounting'
-      fullPath: '/dashboard/accounting'
-      preLoaderRoute: typeof DashboardAccountingImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard/support': {
-      id: '/dashboard/support'
-      path: '/dashboard/support'
-      fullPath: '/dashboard/support'
-      preLoaderRoute: typeof DashboardSupportImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard/teams': {
-      id: '/dashboard/teams'
-      path: '/dashboard/teams'
-      fullPath: '/dashboard/teams'
-      preLoaderRoute: typeof DashboardTeamsImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard/users': {
-      id: '/dashboard/users'
-      path: '/dashboard/users'
-      fullPath: '/dashboard/users'
-      preLoaderRoute: typeof DashboardUsersImport
-      parentRoute: typeof rootRoute
-    }
-    '/dashboard/': {
-      id: '/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardIndexImport
-      parentRoute: typeof rootRoute
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexImport
+      parentRoute: typeof AdminImport
     }
     '/board/$boardId/card/$cardId': {
       id: '/board/$boardId/card/$cardId'
@@ -232,6 +246,24 @@ declare module '@tanstack/react-router' {
 }
 
 // Create and export the route tree
+
+interface AdminRouteChildren {
+  AdminAccountingRoute: typeof AdminAccountingRoute
+  AdminSupportRoute: typeof AdminSupportRoute
+  AdminTeamsRoute: typeof AdminTeamsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountingRoute: AdminAccountingRoute,
+  AdminSupportRoute: AdminSupportRoute,
+  AdminTeamsRoute: AdminTeamsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface BoardBoardIdRouteChildren {
   BoardBoardIdCardCardIdRoute: typeof BoardBoardIdCardCardIdRoute
@@ -258,18 +290,19 @@ const BoardRouteWithChildren = BoardRoute._addFileChildren(BoardRouteChildren)
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/admin/accounting': typeof AdminAccountingRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin/teams': typeof AdminTeamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
-  '/dashboard/accounting': typeof DashboardAccountingRoute
-  '/dashboard/support': typeof DashboardSupportRoute
-  '/dashboard/teams': typeof DashboardTeamsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -278,16 +311,16 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/admin/accounting': typeof AdminAccountingRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin/teams': typeof AdminTeamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
-  '/dashboard/accounting': typeof DashboardAccountingRoute
-  '/dashboard/support': typeof DashboardSupportRoute
-  '/dashboard/teams': typeof DashboardTeamsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/dashboard': typeof DashboardIndexRoute
+  '/admin': typeof AdminIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -295,18 +328,19 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
   '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/admin/accounting': typeof AdminAccountingRoute
+  '/admin/support': typeof AdminSupportRoute
+  '/admin/teams': typeof AdminTeamsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
-  '/dashboard/accounting': typeof DashboardAccountingRoute
-  '/dashboard/support': typeof DashboardSupportRoute
-  '/dashboard/teams': typeof DashboardTeamsRoute
-  '/dashboard/users': typeof DashboardUsersRoute
-  '/dashboard/': typeof DashboardIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -315,18 +349,19 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/board'
     | '/boards'
+    | '/admin/accounting'
+    | '/admin/support'
+    | '/admin/teams'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
-    | '/dashboard/accounting'
-    | '/dashboard/support'
-    | '/dashboard/teams'
-    | '/dashboard/users'
-    | '/dashboard'
+    | '/admin/'
     | '/board/$boardId/card/$cardId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -334,33 +369,34 @@ export interface FileRouteTypes {
     | '/about'
     | '/board'
     | '/boards'
+    | '/admin/accounting'
+    | '/admin/support'
+    | '/admin/teams'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
-    | '/dashboard/accounting'
-    | '/dashboard/support'
-    | '/dashboard/teams'
-    | '/dashboard/users'
-    | '/dashboard'
+    | '/admin'
     | '/board/$boardId/card/$cardId'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/board'
     | '/boards'
+    | '/admin/accounting'
+    | '/admin/support'
+    | '/admin/teams'
+    | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
-    | '/dashboard/accounting'
-    | '/dashboard/support'
-    | '/dashboard/teams'
-    | '/dashboard/users'
-    | '/dashboard/'
+    | '/admin/'
     | '/board/$boardId/card/$cardId'
   fileRoutesById: FileRoutesById
 }
@@ -368,33 +404,25 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
   BoardRoute: typeof BoardRouteWithChildren
   BoardsRoute: typeof BoardsRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  DashboardAccountingRoute: typeof DashboardAccountingRoute
-  DashboardSupportRoute: typeof DashboardSupportRoute
-  DashboardTeamsRoute: typeof DashboardTeamsRoute
-  DashboardUsersRoute: typeof DashboardUsersRoute
-  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
   BoardRoute: BoardRouteWithChildren,
   BoardsRoute: BoardsRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
   AuthSignupRoute: AuthSignupRoute,
-  DashboardAccountingRoute: DashboardAccountingRoute,
-  DashboardSupportRoute: DashboardSupportRoute,
-  DashboardTeamsRoute: DashboardTeamsRoute,
-  DashboardUsersRoute: DashboardUsersRoute,
-  DashboardIndexRoute: DashboardIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -409,17 +437,13 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/admin",
         "/board",
         "/boards",
         "/auth/forgot-password",
         "/auth/login",
         "/auth/logout",
-        "/auth/signup",
-        "/dashboard/accounting",
-        "/dashboard/support",
-        "/dashboard/teams",
-        "/dashboard/users",
-        "/dashboard/"
+        "/auth/signup"
       ]
     },
     "/": {
@@ -427,6 +451,16 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/admin": {
+      "filePath": "admin.tsx",
+      "children": [
+        "/admin/accounting",
+        "/admin/support",
+        "/admin/teams",
+        "/admin/users",
+        "/admin/"
+      ]
     },
     "/board": {
       "filePath": "board.tsx",
@@ -436,6 +470,22 @@ export const routeTree = rootRoute
     },
     "/boards": {
       "filePath": "boards.tsx"
+    },
+    "/admin/accounting": {
+      "filePath": "admin/accounting.tsx",
+      "parent": "/admin"
+    },
+    "/admin/support": {
+      "filePath": "admin/support.tsx",
+      "parent": "/admin"
+    },
+    "/admin/teams": {
+      "filePath": "admin/teams.tsx",
+      "parent": "/admin"
+    },
+    "/admin/users": {
+      "filePath": "admin/users.tsx",
+      "parent": "/admin"
     },
     "/auth/forgot-password": {
       "filePath": "auth/forgot-password.tsx"
@@ -456,20 +506,9 @@ export const routeTree = rootRoute
         "/board/$boardId/card/$cardId"
       ]
     },
-    "/dashboard/accounting": {
-      "filePath": "dashboard/accounting.tsx"
-    },
-    "/dashboard/support": {
-      "filePath": "dashboard/support.tsx"
-    },
-    "/dashboard/teams": {
-      "filePath": "dashboard/teams.tsx"
-    },
-    "/dashboard/users": {
-      "filePath": "dashboard/users.tsx"
-    },
-    "/dashboard/": {
-      "filePath": "dashboard/index.tsx"
+    "/admin/": {
+      "filePath": "admin/index.tsx",
+      "parent": "/admin"
     },
     "/board/$boardId/card/$cardId": {
       "filePath": "board/$boardId/card/$cardId.tsx",
