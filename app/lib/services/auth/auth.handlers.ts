@@ -36,6 +36,7 @@ export const signupHandler = async ({ data }) => {
 
     await session.update({
       email: user.email,
+      role: user.role,
       id: user.id,
     });
 

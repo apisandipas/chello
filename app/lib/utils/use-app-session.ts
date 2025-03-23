@@ -5,6 +5,7 @@ import type { User } from '@prisma/client';
 export type SessionUser = {
   email: User['email'];
   id: User['id'];
+  role: User['role'];
 };
 
 export function useAppSession() {

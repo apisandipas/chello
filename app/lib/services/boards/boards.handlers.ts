@@ -1,4 +1,5 @@
 "use server";
+import { Column, Card } from "@prisma/client";
 import prisma from "~/lib/db-client";
 import { useAppSession } from "~/lib/utils/use-app-session";
 
@@ -52,7 +53,7 @@ export const getBoardHandler = async ({ data }) => {
   }
 };
 
-export const updateColumnOrderHandler = async ({ data }) => {
+export const updateColumnOrderHandler = async ({ data }: { data: { columns: { id: string, sortOrder: number }[] } }) => {
   try {
     const session = await useAppSession();
     if (!session.data || !session.data.id) {
@@ -73,7 +74,7 @@ export const updateColumnOrderHandler = async ({ data }) => {
   }
 };
 
-export const updateCardOrderHandler = async ({ data }) => {
+export const updateCardOrderHandler = async ({ data }: { data: { cards: { id: string, sortOrder: number, columnId: string }[] } }) => {
   try {
     const session = await useAppSession();
     if (!session.data || !session.data.id) {
@@ -97,22 +98,23 @@ export const updateCardOrderHandler = async ({ data }) => {
   }
 };
 
-export const getBoardsHandler = async () => {
+export const getBoardsHandler = async ({ data }: { data: { userId: string, showArchived: boolean } }) => {
+  console.log('getBoardsHandler', data);
   try {
     const session = await useAppSession();
     if (!session.data || !session.data.id) {
       throw new Error("User not found");
     }
     const boards = await prisma.board.findMany({
-      where: { userId: session.data.id, isArchived: false },
+      where: { userId: session.data.id, isArchived: data.showArchived ? true : false },
       include: {
         columns: {
-          where: { isArchived: false },
+          where: { isArchived: data.showArchived ? true : false },
           include: {
             _count: {
               select: {
                 cards: {
-                  where: { isArchived: false },
+                  where: { isArchived: data.showArchived ? true : false },
                 },
               },
             },
@@ -120,6 +122,7 @@ export const getBoardsHandler = async () => {
         },
       },
     });
+    // console.log('boards', boards);
 
     if (!(boards.length > 0)) {
       return [];
@@ -163,13 +166,78 @@ export const archiveBoardHandler = async ({ data }) => {
     if (!session.data || !session.data.id) {
       throw new Error("User not found");
     }
-    await prisma.board.update({
-      where: { id: data.boardId, userId: session.data.id },
-      data: { isArchived: true },
-    });
+
+    await prisma.$transaction([
+      // Archive all cards in the board
+      prisma.card.updateMany({
+        where: {
+          column: {
+            boardId: data.boardId,
+            userId: session.data.id
+          }
+        },
+        data: { isArchived: true }
+      }),
+      // Archive all columns in the board
+      prisma.column.updateMany({
+        where: {
+          boardId: data.boardId,
+          userId: session.data.id
+        },
+        data: { isArchived: true }
+      }),
+      // Archive the board itself
+      prisma.board.update({
+        where: { id: data.boardId, userId: session.data.id },
+        data: { isArchived: true }
+      })
+    ]);
+
     return { success: true };
   } catch (error) {
     console.error(error);
     throw new Error("Failed to archive board");
+  }
+};
+
+export const unarchiveBoardHandler = async ({ data }) => {
+  try {
+    const session = await useAppSession();
+    if (!session.data || !session.data.id) {
+      throw new Error("User not found");
+    }
+
+    await prisma.$transaction([
+      // Archive all cards in the board
+      prisma.card.updateMany({
+        where: {
+          column: {
+            boardId: data.boardId,
+            userId: session.data.id
+          }
+        },
+        data: { isArchived: false }
+      }),
+      // Archive all columns in the board
+      prisma.column.updateMany({
+        where: {
+          boardId: data.boardId,
+          userId: session.data.id
+        },
+        data: { isArchived: false }
+      }),
+      // Archive the board itself
+      prisma.board.update({
+        where: { id: data.boardId, userId: session.data.id },
+        data: { isArchived: false }
+      })
+    ]);
+
+
+
+    return { success: true };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to unarchive board");
   }
 };

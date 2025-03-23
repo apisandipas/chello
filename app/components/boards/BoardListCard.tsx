@@ -1,11 +1,11 @@
 import { Link, useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { archiveBoardFn } from "~/lib/services/boards";
+import { archiveBoardFn, unarchiveBoardFn, updateBoardFn } from "~/lib/services/boards";
 import { BoardWithCounts } from "~/types";
 import { BoardListMenu } from "./BoardListMenu";
 import { useState } from "react";
 
-export function BoardListCard({ board }: { board: BoardWithCounts }) {
+export function BoardListCard({ showArchived, board }: { showArchived: boolean, board: BoardWithCounts }) {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -13,6 +13,12 @@ export function BoardListCard({ board }: { board: BoardWithCounts }) {
     await archiveBoardFn({ data: { boardId: board.id } });
     await router.invalidate();
     toast.success("Board archived");
+  };
+
+  const handleUnarchive = async () => {
+    await unarchiveBoardFn({ data: { boardId: board.id } });
+    await router.invalidate();
+    toast.success("Board unarchived");
   };
 
   return (
@@ -33,8 +39,10 @@ export function BoardListCard({ board }: { board: BoardWithCounts }) {
           }}
         >
           <BoardListMenu
+            showArchived={showArchived}
             onOpenChange={setIsMenuOpen}
             onArchive={handleArchive}
+            onUnarchive={handleUnarchive}
             boardId={board.id}
           />
         </div>

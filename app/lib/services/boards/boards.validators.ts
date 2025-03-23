@@ -53,7 +53,10 @@ export const updateCardOrderValidator = (data: unknown) => {
 };
 
 export const getBoardsValidator = (data: unknown) => {
-  const validated = z.object({ userId: z.string() }).safeParse(data);
+  const validated = z.object({
+    userId: z.string(),
+    showArchived: z.boolean().optional().default(false)
+  }).safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");
   }
@@ -69,6 +72,14 @@ export const createBoardValidator = (data: unknown) => {
 };
 
 export const archiveBoardValidator = (data: unknown) => {
+  const validated = z.object({ boardId: z.string() }).safeParse(data);
+  if (!validated.success) {
+    throw new Error("Invalid data");
+  }
+  return validated.data;
+};
+
+export const unarchiveBoardValidator = (data: unknown) => {
   const validated = z.object({ boardId: z.string() }).safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");

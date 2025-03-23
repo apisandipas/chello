@@ -1,24 +1,38 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
+import { z } from "zod";
 import { BoardListCard } from "~/components/boards/BoardListCard";
 import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
 import { getCurrentUser } from "~/lib/services/auth";
 import { getBoardsFn } from "~/lib/services/boards";
 import { BoardWithCounts } from "~/types";
 
+const boardSearchSchema = z.object({
+  showArchived: z.boolean().optional().catch(false),
+})
+
+
 export const Route = createFileRoute("/boards")({
   component: RouteComponent,
-  beforeLoad: ({ context }) => {
+  validateSearch: boardSearchSchema,
+  loaderDeps: ({ search }) => {
+    return {
+      showArchived: search.showArchived,
+    }
+  },
+  beforeLoad: ({ context, search }) => {
     if (!context.user) {
-      return redirect({
+      throw redirect({
         to: '/auth/login',
         statusCode: 301,
       });
     }
     return {
       user: context.user,
+      showArchived: search.showArchived,
     }
   },
-  loader: async () => {
+  loader: async ({ params, deps }) => {
     const user = await getCurrentUser();
     if (!user) {
       await redirect({
@@ -27,7 +41,9 @@ export const Route = createFileRoute("/boards")({
       });
       return { boards: [] }
     }
-    const boards = await getBoardsFn({ data: { userId: user.id } });
+    const boards = await getBoardsFn({
+      data: { userId: user.id, showArchived: deps.showArchived ?? false }
+    });
     return { boards };
   },
 });
@@ -49,6 +65,8 @@ function EmptyState() {
 
 function RouteComponent() {
   const { boards } = Route.useLoaderData();
+  const { showArchived } = Route.useSearch();
+
 
   if (!boards || boards.length === 0) {
     return <EmptyState />;
@@ -56,13 +74,18 @@ function RouteComponent() {
 
   return (
     <div className="relative min-h-screen bg-gray-100">
-      <div className="p-4">
+      <div className=" flex p-4 items-center">
         <h1 className="text-2xl font-bold mb-4">Boards</h1>
+        <div className="text-sm text-gray-500 ml-auto">
+          <Link from='/boards' to='.' search={{ showArchived: !showArchived }}>
+            {showArchived ? 'Hide Archived' : 'View Archived'}
+          </Link>
+        </div>
       </div>
       <div className="flex-1 max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-3 gap-4">
           {boards.map((board) => (
-            <BoardListCard key={board.id} board={board as unknown as BoardWithCounts} />
+            <BoardListCard key={board.id} showArchived={showArchived ?? false} board={board as unknown as BoardWithCounts} />
           ))}
         </div>
       </div>

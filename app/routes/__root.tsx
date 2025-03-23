@@ -11,6 +11,7 @@ import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
 import { Toaster } from "~/components/ui/sonner";
 import { fetchSessionUser } from "~/lib/services/auth";
 import appCss from "../styles/index.css?url";
+import { GlobalHeader } from "~/components/common/GlobalHeader";
 
 export const Route = createRootRoute({
   notFoundComponent: () => <div>Not Found</div>,
@@ -86,51 +87,10 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
         <HeadContent />
       </head>
       <body>
-        <>
-          <div className="p-2 flex gap-3 items-center">
-            <Link to="/" className="[&.active]:font-bold ">
-              <img src="/chello.svg" alt="Chello" title="Chello" className="w-6 h-6" />
-            </Link>
-            <Link to="/" className="[&.active]:font-bold">
-              Home
-            </Link>
-            <Link to="/about" className="[&.active]:font-bold">
-              About
-            </Link>
-            {isAuthenticated && (
-              <>
-                <Link to="/boards" className="[&.active]:font-bold">
-                  Boards
-                </Link>
-                <CreateBoardButton />
-              </>
-            )}
-
-
-            <div className="ml-auto flex gap-2">
-              {!isAuthenticated ? (
-                <div className="flex gap-2">
-                  <Link to="/auth/login" className="[&.active]:font-bold">
-                    Login
-                  </Link>
-                  <Link to="/auth/signup" className="[&.active]:font-bold">
-                    Signup
-                  </Link>
-                </div>
-              ) : (
-                <div className="flex gap-2">
-                  <Link to="/auth/logout" className="[&.active]:font-bold mr-2">
-                    Logout
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-          <hr />
-          {children}
-          <Scripts />
-          <Toaster />
-        </>
+        <GlobalHeader isAuthenticated={isAuthenticated} ctx={ctx ?? { user: null }} />
+        {children}
+        <Scripts />
+        <Toaster />
       </body>
     </html>
   );

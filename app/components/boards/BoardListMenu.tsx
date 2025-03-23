@@ -10,14 +10,18 @@ import {
 import { useState } from "react";
 
 interface BoardListMenuProps {
+  showArchived: boolean;
   onOpenChange: (open: boolean) => void;
   onArchive: (boardId: string) => void;
+  onUnarchive: (boardId: string) => void;
   boardId: string;
 }
 
 export const BoardListMenu = ({
+  showArchived,
   onOpenChange,
   onArchive,
+  onUnarchive,
   boardId,
 }: BoardListMenuProps) => {
   const [open, setOpen] = useState(false);
@@ -36,9 +40,15 @@ export const BoardListMenu = ({
         />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem onClick={() => onArchive(boardId)}>
-          Archive
-        </DropdownMenuItem>
+        {showArchived ? (
+          <DropdownMenuItem onClick={() => onUnarchive(boardId)}>
+            Unarchive
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuItem onClick={() => onArchive(boardId)}>
+            Archive
+          </DropdownMenuItem>
+        )}
       </DropdownMenuContent>
     </DropdownMenu>
   );

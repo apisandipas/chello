@@ -7,6 +7,7 @@ import {
   getBoardsValidator,
   createBoardValidator,
   archiveBoardValidator,
+  unarchiveBoardValidator,
 } from "./boards.validators";
 import {
   updateBoardHandler,
@@ -16,6 +17,7 @@ import {
   getBoardsHandler,
   createBoardHandler,
   archiveBoardHandler,
+  unarchiveBoardHandler,
 } from "./boards.handlers";
 
 export const updateBoardFn = createServerFn({
@@ -59,3 +61,9 @@ export const archiveBoardFn = createServerFn({
 })
   .validator(archiveBoardValidator)
   .handler(archiveBoardHandler);
+
+export const unarchiveBoardFn = createServerFn({
+  method: "POST",
+})
+  .validator(unarchiveBoardValidator)
+  .handler(unarchiveBoardHandler);

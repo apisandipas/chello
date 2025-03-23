@@ -15,6 +15,11 @@ import { Route as BoardsImport } from './routes/boards'
 import { Route as BoardImport } from './routes/board'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as DashboardIndexImport } from './routes/dashboard/index'
+import { Route as DashboardUsersImport } from './routes/dashboard/users'
+import { Route as DashboardTeamsImport } from './routes/dashboard/teams'
+import { Route as DashboardSupportImport } from './routes/dashboard/support'
+import { Route as DashboardAccountingImport } from './routes/dashboard/accounting'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
 import { Route as AuthSignupImport } from './routes/auth/signup'
 import { Route as AuthLogoutImport } from './routes/auth/logout'
@@ -45,6 +50,36 @@ const AboutRoute = AboutImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardIndexRoute = DashboardIndexImport.update({
+  id: '/dashboard/',
+  path: '/dashboard/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardUsersRoute = DashboardUsersImport.update({
+  id: '/dashboard/users',
+  path: '/dashboard/users',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardTeamsRoute = DashboardTeamsImport.update({
+  id: '/dashboard/teams',
+  path: '/dashboard/teams',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardSupportRoute = DashboardSupportImport.update({
+  id: '/dashboard/support',
+  path: '/dashboard/support',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DashboardAccountingRoute = DashboardAccountingImport.update({
+  id: '/dashboard/accounting',
+  path: '/dashboard/accounting',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -151,6 +186,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BoardBoardIdImport
       parentRoute: typeof BoardImport
     }
+    '/dashboard/accounting': {
+      id: '/dashboard/accounting'
+      path: '/dashboard/accounting'
+      fullPath: '/dashboard/accounting'
+      preLoaderRoute: typeof DashboardAccountingImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/support': {
+      id: '/dashboard/support'
+      path: '/dashboard/support'
+      fullPath: '/dashboard/support'
+      preLoaderRoute: typeof DashboardSupportImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/teams': {
+      id: '/dashboard/teams'
+      path: '/dashboard/teams'
+      fullPath: '/dashboard/teams'
+      preLoaderRoute: typeof DashboardTeamsImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/users': {
+      id: '/dashboard/users'
+      path: '/dashboard/users'
+      fullPath: '/dashboard/users'
+      preLoaderRoute: typeof DashboardUsersImport
+      parentRoute: typeof rootRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/board/$boardId/card/$cardId': {
       id: '/board/$boardId/card/$cardId'
       path: '/card/$cardId'
@@ -195,6 +265,11 @@ export interface FileRoutesByFullPath {
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
+  '/dashboard/accounting': typeof DashboardAccountingRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/teams': typeof DashboardTeamsRoute
+  '/dashboard/users': typeof DashboardUsersRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -208,6 +283,11 @@ export interface FileRoutesByTo {
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
+  '/dashboard/accounting': typeof DashboardAccountingRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/teams': typeof DashboardTeamsRoute
+  '/dashboard/users': typeof DashboardUsersRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -222,6 +302,11 @@ export interface FileRoutesById {
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/signup': typeof AuthSignupRoute
   '/board/$boardId': typeof BoardBoardIdRouteWithChildren
+  '/dashboard/accounting': typeof DashboardAccountingRoute
+  '/dashboard/support': typeof DashboardSupportRoute
+  '/dashboard/teams': typeof DashboardTeamsRoute
+  '/dashboard/users': typeof DashboardUsersRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/board/$boardId/card/$cardId': typeof BoardBoardIdCardCardIdRoute
 }
 
@@ -237,6 +322,11 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
+    | '/dashboard/accounting'
+    | '/dashboard/support'
+    | '/dashboard/teams'
+    | '/dashboard/users'
+    | '/dashboard'
     | '/board/$boardId/card/$cardId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -249,6 +339,11 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
+    | '/dashboard/accounting'
+    | '/dashboard/support'
+    | '/dashboard/teams'
+    | '/dashboard/users'
+    | '/dashboard'
     | '/board/$boardId/card/$cardId'
   id:
     | '__root__'
@@ -261,6 +356,11 @@ export interface FileRouteTypes {
     | '/auth/logout'
     | '/auth/signup'
     | '/board/$boardId'
+    | '/dashboard/accounting'
+    | '/dashboard/support'
+    | '/dashboard/teams'
+    | '/dashboard/users'
+    | '/dashboard/'
     | '/board/$boardId/card/$cardId'
   fileRoutesById: FileRoutesById
 }
@@ -274,6 +374,11 @@ export interface RootRouteChildren {
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
   AuthSignupRoute: typeof AuthSignupRoute
+  DashboardAccountingRoute: typeof DashboardAccountingRoute
+  DashboardSupportRoute: typeof DashboardSupportRoute
+  DashboardTeamsRoute: typeof DashboardTeamsRoute
+  DashboardUsersRoute: typeof DashboardUsersRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -285,6 +390,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
   AuthSignupRoute: AuthSignupRoute,
+  DashboardAccountingRoute: DashboardAccountingRoute,
+  DashboardSupportRoute: DashboardSupportRoute,
+  DashboardTeamsRoute: DashboardTeamsRoute,
+  DashboardUsersRoute: DashboardUsersRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -304,7 +414,12 @@ export const routeTree = rootRoute
         "/auth/forgot-password",
         "/auth/login",
         "/auth/logout",
-        "/auth/signup"
+        "/auth/signup",
+        "/dashboard/accounting",
+        "/dashboard/support",
+        "/dashboard/teams",
+        "/dashboard/users",
+        "/dashboard/"
       ]
     },
     "/": {
@@ -340,6 +455,21 @@ export const routeTree = rootRoute
       "children": [
         "/board/$boardId/card/$cardId"
       ]
+    },
+    "/dashboard/accounting": {
+      "filePath": "dashboard/accounting.tsx"
+    },
+    "/dashboard/support": {
+      "filePath": "dashboard/support.tsx"
+    },
+    "/dashboard/teams": {
+      "filePath": "dashboard/teams.tsx"
+    },
+    "/dashboard/users": {
+      "filePath": "dashboard/users.tsx"
+    },
+    "/dashboard/": {
+      "filePath": "dashboard/index.tsx"
     },
     "/board/$boardId/card/$cardId": {
       "filePath": "board/$boardId/card/$cardId.tsx",
