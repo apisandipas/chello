@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as BoardsImport } from './routes/boards'
+import { Route as BoardImport } from './routes/board'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
@@ -29,6 +30,12 @@ const BoardsRoute = BoardsImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const BoardRoute = BoardImport.update({
+  id: '/board',
+  path: '/board',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
@@ -42,9 +49,9 @@ const IndexRoute = IndexImport.update({
 } as any)
 
 const BoardBoardIdRoute = BoardBoardIdImport.update({
-  id: '/board/$boardId',
-  path: '/board/$boardId',
-  getParentRoute: () => rootRoute,
+  id: '/$boardId',
+  path: '/$boardId',
+  getParentRoute: () => BoardRoute,
 } as any)
 
 const AuthSignupRoute = AuthSignupImport.update({
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
+    '/board': {
+      id: '/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof BoardImport
+      parentRoute: typeof rootRoute
+    }
     '/boards': {
       id: '/boards'
       path: '/boards'
@@ -132,10 +146,10 @@ declare module '@tanstack/react-router' {
     }
     '/board/$boardId': {
       id: '/board/$boardId'
-      path: '/board/$boardId'
+      path: '/$boardId'
       fullPath: '/board/$boardId'
       preLoaderRoute: typeof BoardBoardIdImport
-      parentRoute: typeof rootRoute
+      parentRoute: typeof BoardImport
     }
     '/board/$boardId/card/$cardId': {
       id: '/board/$boardId/card/$cardId'
@@ -161,9 +175,20 @@ const BoardBoardIdRouteWithChildren = BoardBoardIdRoute._addFileChildren(
   BoardBoardIdRouteChildren,
 )
 
+interface BoardRouteChildren {
+  BoardBoardIdRoute: typeof BoardBoardIdRouteWithChildren
+}
+
+const BoardRouteChildren: BoardRouteChildren = {
+  BoardBoardIdRoute: BoardBoardIdRouteWithChildren,
+}
+
+const BoardRouteWithChildren = BoardRoute._addFileChildren(BoardRouteChildren)
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -176,6 +201,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -189,6 +215,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
@@ -203,6 +230,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/board'
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -214,6 +242,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/board'
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -225,6 +254,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/board'
     | '/boards'
     | '/auth/forgot-password'
     | '/auth/login'
@@ -238,23 +268,23 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BoardRoute: typeof BoardRouteWithChildren
   BoardsRoute: typeof BoardsRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
   AuthSignupRoute: typeof AuthSignupRoute
-  BoardBoardIdRoute: typeof BoardBoardIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BoardRoute: BoardRouteWithChildren,
   BoardsRoute: BoardsRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
   AuthSignupRoute: AuthSignupRoute,
-  BoardBoardIdRoute: BoardBoardIdRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -269,12 +299,12 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
+        "/board",
         "/boards",
         "/auth/forgot-password",
         "/auth/login",
         "/auth/logout",
-        "/auth/signup",
-        "/board/$boardId"
+        "/auth/signup"
       ]
     },
     "/": {
@@ -282,6 +312,12 @@ export const routeTree = rootRoute
     },
     "/about": {
       "filePath": "about.tsx"
+    },
+    "/board": {
+      "filePath": "board.tsx",
+      "children": [
+        "/board/$boardId"
+      ]
     },
     "/boards": {
       "filePath": "boards.tsx"
@@ -300,6 +336,7 @@ export const routeTree = rootRoute
     },
     "/board/$boardId": {
       "filePath": "board/$boardId.tsx",
+      "parent": "/board",
       "children": [
         "/board/$boardId/card/$cardId"
       ]

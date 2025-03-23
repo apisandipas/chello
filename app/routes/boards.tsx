@@ -16,14 +16,11 @@ type BoardWithCounts = Board & {
 export const Route = createFileRoute("/boards")({
   component: RouteComponent,
   beforeLoad: ({ context }: { context: { user?: unknown } }) => {
-    console.log('boards route - beforeload', { context })
     if (!context.user) {
-      // Redirect to the home page if the user is not authenticated
       return redirect({
         to: '/auth/login',
         statusCode: 301,
       });
-
     }
     return {
       user: context.user,

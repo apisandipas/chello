@@ -15,10 +15,7 @@ import appCss from "../index.css?url";
 export const Route = createRootRoute({
   notFoundComponent: () => <div>Not Found</div>,
   beforeLoad: async () => {
-    // get the user from the session and add to context
     const user = await fetchSessionUser();
-
-    console.log("root- beforeLoas - user", user);
     return {
       user,
     };
@@ -82,7 +79,10 @@ function RootComponent() {
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const router = useRouter();
+  const ctx = Route.useRouteContext();
+  const isAuthenticated = !!ctx.user;
 
+  console.log("isAuthenticated", isAuthenticated);
   return (
     <html>
       <head>
@@ -97,30 +97,40 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             <Link to="/about" className="[&.active]:font-bold">
               About
             </Link>
-            <Link to="/boards" className="[&.active]:font-bold">
-              Boards
-            </Link>
-            <>
-              <Link to="/auth/login" className="[&.active]:font-bold">
-                Login
-              </Link>
-              <Link to="/auth/signup" className="[&.active]:font-bold">
-                Signup
-              </Link>
-            </>
+            {isAuthenticated && (
+              <>
+                <Link to="/boards" className="[&.active]:font-bold">
+                  Boards
+                </Link>
+                <CreateBoardButton />
+              </>
+            )}
 
-            <Link to="/auth/logout" className="[&.active]:font-bold">
-              Logout
-            </Link>
-            <div className="ml-auto">
-              <CreateBoardButton />
+
+            <div className="ml-auto flex gap-2">
+              {!isAuthenticated ? (
+                <div className="flex gap-2">
+                  <Link to="/auth/login" className="[&.active]:font-bold">
+                    Login
+                  </Link>
+                  <Link to="/auth/signup" className="[&.active]:font-bold">
+                    Signup
+                  </Link>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Link to="/auth/logout" className="[&.active]:font-bold mr-2">
+                    Logout
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
           <hr />
+          {children}
+          <Scripts />
+          <Toaster />
         </>
-        {children}
-        <Scripts />
-        <Toaster />
       </body>
     </html>
   );
