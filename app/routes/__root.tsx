@@ -78,11 +78,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
-  const router = useRouter();
   const ctx = Route.useRouteContext();
   const isAuthenticated = !!ctx.user;
-
-  console.log("isAuthenticated", isAuthenticated);
   return (
     <html>
       <head>

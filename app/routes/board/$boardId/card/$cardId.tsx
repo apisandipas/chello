@@ -6,9 +6,12 @@ import { getCardFn } from '~/lib/services/cards';
 export const Route = createFileRoute("/board/$boardId/card/$cardId")({
   component: RouteComponent,
   errorComponent: CardErrorComponent,
-  loader: async ({ params }) => {
+  loader: async ({ params, context }) => {
+    console.log('[Route] Params:', params);
+    console.log('[Route] Context:', context);
     const { card } = await getCardFn({ data: { id: params.cardId } });
-    return { card, boardId: params.boardId };
+    console.log('[Route] Card:', card);
+    return { card: card, boardId: params.boardId };
   }
 
 });
@@ -17,7 +20,6 @@ function RouteComponent() {
   const router = useRouter();
 
   const { card, boardId } = Route.useLoaderData();
-  console.log(card);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {

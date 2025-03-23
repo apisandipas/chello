@@ -49,6 +49,7 @@ export const Route = createFileRoute("/board/$boardId")({
 
 function BoardComponent() {
   const boardData = Route.useLoaderData();
+
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 

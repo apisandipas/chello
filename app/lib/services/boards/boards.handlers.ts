@@ -1,3 +1,4 @@
+"use server";
 import prisma from "~/lib/db-client";
 import { useAppSession } from "~/lib/utils/use-app-session";
 
