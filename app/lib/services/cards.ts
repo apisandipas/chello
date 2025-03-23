@@ -47,7 +47,7 @@ export const createCardFn = createServerFn({
       return { card };
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to create card");
+      throw error;
     }
   });
 
@@ -77,7 +77,7 @@ export const updateCardFn = createServerFn({
       return { card };
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to update card");
+      throw error;
     }
   });
 
@@ -105,6 +105,34 @@ export const archiveCardFn = createServerFn({
       return { card };
     } catch (error) {
       console.error(error);
-      throw new Error("Failed to archive card");
+      throw error;
+    }
+  });
+
+
+export const getCardFn = createServerFn({
+  method: "GET",
+})
+  .validator((data) => {
+    const validated = z.object({ id: z.string() }).safeParse(data);
+    if (!validated.success) {
+      throw new Error("Invalid data");
+    }
+    return validated.data;
+  })
+  .handler(async ({ data }) => {
+    try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+
+      const card = await prisma.card.findUnique({
+        where: { id: data.id, userId: session.data.id },
+      });
+      return { card };
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
   });

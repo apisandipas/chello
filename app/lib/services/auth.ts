@@ -55,9 +55,9 @@ export const signup = createServerFn({
 
       if (existingUser) {
         return {
-          user: null,
-          token: null,
-          error: 'Email already in use',
+          userNotFound: false,
+          error: true,
+          message: 'Email already in use',
         };
       }
 
@@ -91,10 +91,11 @@ export const signup = createServerFn({
 
 
     } catch (error) {
+      console.error('[Signup] Error:', error);
       return {
-        user: null,
-        token: null,
-        error: 'Failed to create account',
+        userNotFound: false,
+        error: true,
+        message: 'Failed to create account',
       };
     }
   });
@@ -121,9 +122,9 @@ export const login = createServerFn({
 
       if (!user) {
         return {
-          user: null,
-          token: null,
-          error: 'Invalid credentials',
+          userNotFound: true,
+          error: true,
+          message: 'Invalid credentials',
         };
       }
 
@@ -132,9 +133,9 @@ export const login = createServerFn({
       if (!isValidPassword) {
         console.error('[Login] Invalid credentials');
         return {
-          user: null,
-          token: null,
-          error: 'Invalid credentials',
+          userNotFound: false,
+          error: true,
+          message: 'Invalid credentials',
         };
       }
 
@@ -153,59 +154,58 @@ export const login = createServerFn({
         message: 'Logged in',
       }
 
-      // const { password, ...userWithoutPassword } = user;
-
-      // const token = generateToken(user);
-      // setCookie(TOKEN_KEY, token);
-      // setCookie(USER_KEY, JSON.stringify(userWithoutPassword));
-
-      // return {
-      //   user: userWithoutPassword,
-      //   token,
-      //   error: null,
-      // };
     } catch (error) {
       console.error('[Login] Error:', error);
       return {
-        user: null,
-        token: null,
-        error: 'Failed to log in',
+        error: true,
+        userNotFound: null,
+        message: 'Failed to log in',
       };
     }
   });
 
 export const fetchSessionUser = createServerFn().handler(async () => {
-  // We need to auth on the server so we have access to secure cookies
-  const session = await useAppSession();
+  try {
+    // We need to auth on the server so we have access to secure cookies
+    const session = await useAppSession();
 
-  if (!session.data.email) {
-    return null;
+    if (!session.data.email) {
+      return null;
+    }
+
+    return {
+      ...session.data,
+    };
+  } catch (error) {
+    console.error('[Fetch Session User] Error:', error);
+    throw error;
   }
-
-  return {
-    ...session.data,
-  };
 });
 
 
 export const getCurrentUser = createServerFn().handler(async () => {
-  const session = await useAppSession();
+  try {
+    const session = await useAppSession();
 
-  if (!session.data.email) {
-    throw new Error('Not authenticated');
+    if (!session.data.email) {
+      throw new Error('Not authenticated');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: session.data.email,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+
+    return user;
+  } catch (error) {
+    console.error('[Get Current User] Error:', error);
+    throw error;
   }
-
-  const user = await prisma.user.findUnique({
-    where: {
-      email: session.data.email,
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  });
-
-  return user;
 });
 
 

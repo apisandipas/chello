@@ -51,7 +51,7 @@ export const CardContent = ({
     return (
       <input
         type="text"
-        className="font-medium text-gray-900 pr-6 border border-blue-500 rounded-md p-2"
+        className="font-medium text-gray-900 pr-6 border border-cyan-700 rounded-md p-2"
         value={name}
         onChange={(e) => setName(e.target.value)}
         ref={inputRef}
