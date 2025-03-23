@@ -14,6 +14,7 @@ export function AddAnotherColumn({ boardId }: { boardId: string }) {
   }, [isAdding]);
 
   const handleAddColumn = async () => {
+    if (inputRef.current?.value === "") return;
     if (inputRef.current) {
       await createColumnFn({
         data: { name: inputRef.current.value, boardId },
@@ -47,7 +48,7 @@ export function AddAnotherColumn({ boardId }: { boardId: string }) {
 
             <div className="flex gap-2">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded line-height-[1.5]"
+                className="bg-cyan-700 hover:bg-cyan-800 text-white py-2 px-4 rounded line-height-[1.5]"
                 onClick={handleAddColumn}
               >
                 Add Column

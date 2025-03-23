@@ -159,7 +159,7 @@ export const getBoardsFn = createServerFn({
         throw new Error("User not found");
       }
       const boards = await prisma.board.findMany({
-        where: { userId: session.data.id },
+        where: { userId: session.data.id, isArchived: false },
         include: {
           columns: {
             where: {
@@ -183,6 +183,7 @@ export const getBoardsFn = createServerFn({
       if (!(boards.length > 0)) {
         return []
       }
+      console.log(boards);
 
       // Transform the data to include total counts
       return boards.map(board => ({
@@ -224,5 +225,34 @@ export const createBoardFn = createServerFn({
     } catch (error) {
       console.error(error);
       throw new Error("Failed to create board");
+    }
+  });
+
+export const archiveBoardFn = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    const validated = z.object({ boardId: z.string() }).safeParse(data);
+    if (!validated.success) {
+      throw new Error("Invalid data");
+    }
+    return validated.data;
+  })
+  .handler(async ({ data }) => {
+    try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+      await prisma.board.update({
+        where: { id: data.boardId, userId: session.data.id },
+        data: {
+          isArchived: true,
+        },
+      });
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      throw new Error("Failed to archive board");
     }
   });

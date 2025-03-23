@@ -20,7 +20,7 @@ export function ColumnHeader({ column }: { column: Column }) {
   }, [isEditing]);
 
   const persistNameChange = async () => {
-    if (editedName === column.name) return;
+    if (editedName === column.name || editedName === "") return;
     await updateColumnFn({
       data: { name: editedName, columnId: column.id },
     });

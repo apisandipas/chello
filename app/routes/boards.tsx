@@ -1,21 +1,13 @@
-import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { getBoardsFn } from "~/lib/services/boards";
-import type { Board } from "@prisma/client";
-import { getCurrentUser } from "~/lib/services/auth";
-import { Button } from "~/components/ui/button";
-import { PlusCircle } from "lucide-react";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { BoardListCard } from "~/components/boards/BoardListCard";
 import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
-
-type BoardWithCounts = Board & {
-  _count: {
-    columns: number;
-    cards: number;
-  };
-};
+import { getCurrentUser } from "~/lib/services/auth";
+import { getBoardsFn } from "~/lib/services/boards";
+import { BoardWithCounts } from "~/types";
 
 export const Route = createFileRoute("/boards")({
   component: RouteComponent,
-  beforeLoad: ({ context }: { context: { user?: unknown } }) => {
+  beforeLoad: ({ context }) => {
     if (!context.user) {
       return redirect({
         to: '/auth/login',
@@ -70,7 +62,7 @@ function RouteComponent() {
       <div className="flex-1 max-w-7xl mx-auto p-4">
         <div className="grid grid-cols-3 gap-4">
           {boards.map((board) => (
-            <BoardListCard key={board.id} board={board as BoardWithCounts} />
+            <BoardListCard key={board.id} board={board as unknown as BoardWithCounts} />
           ))}
         </div>
       </div>
@@ -78,18 +70,3 @@ function RouteComponent() {
   );
 }
 
-function BoardListCard({ board }: { board: BoardWithCounts }) {
-  return (
-    <Link to="/board/$boardId" params={{ boardId: board.id }}>
-      <div className="bg-white rounded-lg shadow-md p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg">
-        <h2 className="text-lg font-bold">{board.name}</h2>
-        <div className="text-sm text-gray-500">
-          {board._count.columns} columns
-        </div>
-        <div className="text-sm text-gray-500">
-          {board._count.cards} cards
-        </div>
-      </div>
-    </Link>
-  );
-}

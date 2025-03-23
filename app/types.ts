@@ -25,6 +25,13 @@ export interface Board {
   updatedAt: Date;
 }
 
+export type BoardWithCounts = Board & {
+  _count: {
+    columns: number;
+    cards: number;
+  };
+};
+
 export interface User {
   id: string;
   email: string;

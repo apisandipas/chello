@@ -14,14 +14,14 @@ datasource db {
 }
 
 model Board {
-  id        String   @id @default(uuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId  String
-  user    User     @relation(fields: [userId], references: [id])
-  columns Column[]
+  id         String   @id @default(uuid())
+  name       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isArchived Boolean  @default(false)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  columns    Column[]
 }
 
 model Column {

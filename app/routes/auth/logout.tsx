@@ -4,9 +4,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 const logoutFn = createServerFn().handler(async () => {
   const session = await useAppSession();
-
   session.clear();
-
   throw redirect({
     href: '/auth/login',
   });
@@ -15,5 +13,6 @@ const logoutFn = createServerFn().handler(async () => {
 export const Route = createFileRoute('/auth/logout')({
   preload: false,
   loader: () => logoutFn(),
+
 });
 

@@ -94,6 +94,9 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
             <Link to="/" className="[&.active]:font-bold ">
               <img src="/chello.svg" alt="Chello" title="Chello" className="w-6 h-6" />
             </Link>
+            <Link to="/" className="[&.active]:font-bold">
+              Home
+            </Link>
             <Link to="/about" className="[&.active]:font-bold">
               About
             </Link>
