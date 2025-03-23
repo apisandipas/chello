@@ -7,6 +7,33 @@ type ServerContext = {
   user: SessionUser;
 };
 
+export const updateBoardFn = createServerFn({
+  method: "POST",
+})
+  .validator((data) => {
+    const validated = z.object({ id: z.string(), name: z.string() }).safeParse(data);
+    if (!validated.success) {
+      throw new Error("Invalid data");
+    }
+    return validated.data;
+  })
+  .handler(async ({ data }) => {
+    try {
+      const session = await useAppSession();
+      if (!session.data || !session.data.id) {
+        throw new Error("User not found");
+      }
+      await prisma.board.update({
+        where: { id: data.id, userId: session.data.id },
+        data: { name: data.name },
+      });
+      return { success: true };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  });
+
 export const getBoardFn = createServerFn({
   method: "GET",
 })

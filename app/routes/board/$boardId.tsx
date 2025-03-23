@@ -29,6 +29,7 @@ import {
   updateColumnOrderFn,
 } from "~/lib/services/boards";
 import type { Card, Column } from "~/types";
+import { BoardHeader } from "~/components/boards/BoardHeader";
 
 const dropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -244,7 +245,7 @@ function BoardComponent() {
   return (
     <div className="relative h-screen bg-gray-100 w-full overflow-hidden">
       <div className="p-4 h-full overflow-x-auto">
-        <h1 className="text-2xl font-bold mb-4">{boardData.name}</h1>
+        <BoardHeader board={boardData} />
         {isClient ? (
           <DndContext
             sensors={sensors}
