@@ -13,7 +13,7 @@ export const createCardValidator = (data: unknown) => {
 
 export const updateCardValidator = (data: unknown) => {
   const validated = z
-    .object({ id: z.string(), name: z.string() })
+    .object({ id: z.string(), name: z.string(), description: z.string().optional() })
     .safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");

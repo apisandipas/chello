@@ -10,7 +10,7 @@ import { ReactNode } from "react";
 import { CreateBoardButton } from "~/components/boards/CreateBoardButton";
 import { Toaster } from "~/components/ui/sonner";
 import { fetchSessionUser } from "~/lib/services/auth";
-import appCss from "../index.css?url";
+import appCss from "../styles/index.css?url";
 
 export const Route = createRootRoute({
   notFoundComponent: () => <div>Not Found</div>,

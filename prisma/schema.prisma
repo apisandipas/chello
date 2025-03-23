@@ -40,16 +40,17 @@ model Column {
 }
 
 model Card {
-  id         String   @id @default(uuid())
-  name       String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  sortOrder  Int      @default(0)
-  isArchived Boolean  @default(false)
-  columnId   String
-  column     Column   @relation(fields: [columnId], references: [id])
-  userId     String?
-  user       User?    @relation(fields: [userId], references: [id])
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  sortOrder   Int      @default(0)
+  isArchived  Boolean  @default(false)
+  columnId    String
+  column      Column   @relation(fields: [columnId], references: [id])
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
 }
 
 model User {

@@ -1,0 +1,53 @@
+.prose h1 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.prose h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.prose h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.prose h4 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.prose p {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.prose ul {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.prose ol {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.prose li {
+  font-size: 1rem;
+  font-weight: 400;
+  list-style-type: disc;
+  margin-left: 1rem;
+}
+
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.prose blockquote {
+  background-color: #f0f0f0;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 400;
+}

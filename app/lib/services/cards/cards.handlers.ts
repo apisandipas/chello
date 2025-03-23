@@ -38,6 +38,7 @@ export const createCardHandler = async ({ data }) => {
 };
 
 export const updateCardHandler = async ({ data }) => {
+  console.log("updateCardHandler", data);
   try {
     const session = await useAppSession();
     if (!session.data || !session.data.id) {
@@ -46,7 +47,7 @@ export const updateCardHandler = async ({ data }) => {
 
     const card = await prisma.card.update({
       where: { id: data.id, userId: session.data.id },
-      data: { name: data.name },
+      data: { name: data.name, description: data.description },
     });
     return { card };
   } catch (error) {
