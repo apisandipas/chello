@@ -9,7 +9,7 @@
 
 ### Development
 
-INstall `bun` is your havent already.
+Install `bun` is your havent already.
 
 Run `bun intall` to satisfy dependencies.
 
