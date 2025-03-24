@@ -14,7 +14,7 @@ export const AccountMenu = ({ user }: { user: SessionUser }) => {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem>
-          <Link to="/auth/logout">
+          <Link to="/auth/logout" className='w-full'>
             Logout
           </Link>
         </DropdownMenuItem>

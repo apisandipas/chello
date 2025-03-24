@@ -1,13 +1,13 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
-import { SessionUser } from '~/lib/utils/use-app-session'
-import { Link } from '@tanstack/react-router'
-import { HomeIcon, Users, UsersIcon, Calculator, HelpCircle } from 'lucide-react'
+import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
+import { Calculator, HelpCircle, HomeIcon, Users, UsersIcon, LogOut } from 'lucide-react';
+import Logo from '~/components/icons/logo';
+import { SessionUser } from '~/lib/utils/use-app-session';
 
 export const Route = createFileRoute('/admin')({
   component: RouteComponent,
   beforeLoad: ({ context }: { context: { user?: SessionUser | null } }) => {
-    console.log('[Dashboard] Context:', context);
-    if (!context.user) {
+    console.log('[Admin] Context:', context.user);
+    if (!context.user || context.user.role !== 'SUPER_ADMIN') {
       throw redirect({
         to: '/auth/login',
         statusCode: 301,
@@ -20,16 +20,18 @@ export const Route = createFileRoute('/admin')({
 })
 
 function RouteComponent() {
+  const { user } = Route.useRouteContext()
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-cyan-800 text-white">
-        <div className="p-4">
+      <aside className="w-64 bg-cyan-800 text-white border-r border-pink-500">
+        <div className="p-4 flex items-center justify-center gap-2">
+          <Logo fill="#ffffff" className="w-8 h-8" />
           <h1 className="text-2xl font-bold">Chello Admin</h1>
         </div>
 
-        <nav className="mt-8">
-          <div className="px-4 space-y-2">
+        <nav className="flex flex-col h-[calc(100%-theme(space.16))]">
+          <div className="flex flex-col px-4 space-y-2">
             <Link
               to="/admin"
               activeOptions={{ exact: true }}
@@ -74,6 +76,16 @@ function RouteComponent() {
             >
               <HelpCircle className="w-5 h-5" />
               <span>Support</span>
+            </Link>
+          </div>
+
+          <div className="mt-auto px-4 mb-4">
+            <Link
+              to="/auth/logout"
+              className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors w-full"
+            >
+              <LogOut className="w-5 h-5" />
+              <span>Logout</span>
             </Link>
           </div>
         </nav>

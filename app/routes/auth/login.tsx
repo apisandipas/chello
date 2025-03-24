@@ -32,7 +32,11 @@ function RouteComponent() {
 
       toast.success(result.message)
       formRef.current?.reset()
-      router.navigate({ to: '/boards' })
+      if (result.isAdmin) {
+        router.navigate({ to: '/admin' })
+      } else {
+        router.navigate({ to: '/boards' })
+      }
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)

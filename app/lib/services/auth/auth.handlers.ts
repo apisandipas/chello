@@ -2,6 +2,7 @@
 import * as argon2 from 'argon2';
 import prisma from '../../db-client';
 import { useAppSession } from '../../utils/use-app-session';
+import { UserRole } from '@prisma/client';
 
 export const signupHandler = async ({ data }) => {
   try {
@@ -36,7 +37,7 @@ export const signupHandler = async ({ data }) => {
 
     await session.update({
       email: user.email,
-      role: user.role,
+      role: UserRole.USER,
       id: user.id,
     });
 
@@ -64,6 +65,7 @@ export const loginHandler = async ({ data }) => {
         id: true,
         email: true,
         password: true,
+        role: true,
       },
     });
 
@@ -90,12 +92,16 @@ export const loginHandler = async ({ data }) => {
     await session.update({
       email: user.email,
       id: user.id,
+      role: user.role,
     });
+    console.log('[Login] user:', user);
+    console.log('[Login] session:', session.data);
 
     return {
       error: false,
       userNotFound: false,
       message: 'Logged in',
+      isAdmin: user.role === UserRole.SUPER_ADMIN,
     }
 
   } catch (error) {
