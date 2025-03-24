@@ -24,7 +24,7 @@ function RouteComponent() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-cyan-800 text-white border-r border-pink-500">
+      <aside className="w-64 bg-cyan-800 text-white">
         <div className="p-4 flex items-center justify-center gap-2">
           <Logo fill="#ffffff" className="w-8 h-8" />
           <h1 className="text-2xl font-bold">Chello Admin</h1>
@@ -44,6 +44,7 @@ function RouteComponent() {
 
             <Link
               to="/admin/users"
+              search={{ page: 1, pageSize: 5 }}
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
               activeProps={{ className: 'bg-cyan-900' }}
             >
