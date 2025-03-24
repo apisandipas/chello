@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearch } from '@tanstack/react-router'
 import { Input } from '~/components/ui/input'
 import {
   Table,
@@ -16,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select'
-import { Search, ChevronDown, ChevronUp, Plus, Pencil, Trash2, UserPlus, X } from 'lucide-react'
+import { Search, ChevronDown, ChevronUp, Plus, Pencil, Trash2, UserPlus, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Checkbox } from '~/components/ui/checkbox'
 import {
@@ -45,14 +46,43 @@ const mockUsers = [
     lastSignIn: '2024-03-19T15:45:00Z',
     team: 'Marketing',
   },
-  // Add more mock users as needed
+  {
+    id: '3',
+    email: 'mike@example.com',
+    role: 'User',
+    lastSignIn: '2024-03-18T09:15:00Z',
+    team: 'Sales',
+  },
+  {
+    id: '4',
+    email: 'lisa@example.com',
+    role: 'Admin',
+    lastSignIn: '2024-03-17T14:20:00Z',
+    team: 'Design',
+  },
+  {
+    id: '5',
+    email: 'david@example.com',
+    role: 'User',
+    lastSignIn: '2024-03-16T11:45:00Z',
+    team: 'Engineering',
+  },
 ]
+
+const PAGE_SIZE_OPTIONS = [2, 5, 10, 20, 50]
 
 export const Route = createFileRoute('/admin/users')({
   component: RouteComponent,
+  validateSearch: (search: Record<string, unknown>) => {
+    return {
+      page: Number(search.page) || 1,
+      pageSize: Number(search.pageSize) || 10,
+    }
+  },
 })
 
 function RouteComponent() {
+  const { page = 1, pageSize = 10 } = useSearch({ from: '/admin/users' })
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [sortConfig, setSortConfig] = useState<{
@@ -103,6 +133,29 @@ function RouteComponent() {
       }
       return aValue < bValue ? 1 : -1
     })
+
+  const totalPages = Math.ceil(filteredUsers.length / pageSize)
+  const paginatedUsers = filteredUsers.slice(
+    (page - 1) * pageSize,
+    page * pageSize
+  )
+
+  const handlePageChange = (newPage: number) => {
+    const validPage = Math.max(1, Math.min(newPage, totalPages))
+    window.history.pushState(
+      {},
+      '',
+      `/admin/users?page=${validPage}&pageSize=${pageSize}`
+    )
+  }
+
+  const handlePageSizeChange = (newSize: number) => {
+    window.history.pushState(
+      {},
+      '',
+      `/admin/users?page=1&pageSize=${newSize}`
+    )
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -223,6 +276,49 @@ function RouteComponent() {
       )}
 
       <div className="bg-white rounded-lg shadow">
+        <div className="p-4 border-b flex justify-between items-center">
+          <div className="flex items-center gap-4">
+            <span className="text-sm text-gray-600">Rows per page:</span>
+            <Select
+              value={pageSize.toString()}
+              onValueChange={(value) => handlePageSizeChange(Number(value))}
+            >
+              <SelectTrigger className="w-[70px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAGE_SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={size.toString()}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">
+              {Math.min((page - 1) * pageSize + 1, filteredUsers.length)}-{Math.min(page * pageSize, filteredUsers.length)} of {filteredUsers.length}
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(page - 1)}
+                disabled={page === 1}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handlePageChange(page + 1)}
+                disabled={page === totalPages}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
         <Table>
           <TableHeader>
             <TableRow>
@@ -280,7 +376,7 @@ function RouteComponent() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
+            {paginatedUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                   <Checkbox
