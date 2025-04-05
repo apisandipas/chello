@@ -1,26 +1,37 @@
-import { createFileRoute, Link, Outlet, redirect } from '@tanstack/react-router';
-import { Calculator, HelpCircle, HomeIcon, Users, UsersIcon, LogOut } from 'lucide-react';
-import Logo from '~/components/icons/logo';
-import { SessionUser } from '~/lib/utils/use-app-session';
+import {
+  createFileRoute,
+  Link,
+  Outlet,
+  redirect,
+} from "@tanstack/react-router";
+import {
+  Calculator,
+  HelpCircle,
+  HomeIcon,
+  Users,
+  UsersIcon,
+  LogOut,
+} from "lucide-react";
+import Logo from "~/components/icons/logo";
+import { SessionUser } from "~/lib/utils/use-app-session";
 
-export const Route = createFileRoute('/admin')({
+export const Route = createFileRoute("/admin")({
   component: RouteComponent,
   beforeLoad: ({ context }: { context: { user?: SessionUser | null } }) => {
-    console.log('[Admin] Context:', context.user);
-    if (!context.user || context.user.role !== 'SUPER_ADMIN') {
+    console.log("[Admin] Context:", context.user);
+    if (!context.user || context.user.role !== "SUPER_ADMIN") {
       throw redirect({
-        to: '/auth/login',
+        to: "/auth/login",
         statusCode: 301,
       });
     }
     return {
       user: context.user,
-    }
+    };
   },
-})
+});
 
 function RouteComponent() {
-  const { user } = Route.useRouteContext()
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -36,7 +47,7 @@ function RouteComponent() {
               to="/admin"
               activeOptions={{ exact: true }}
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
-              activeProps={{ className: 'bg-cyan-900' }}
+              activeProps={{ className: "bg-cyan-900" }}
             >
               <HomeIcon className="w-5 h-5" />
               <span>Dashboard</span>
@@ -46,7 +57,7 @@ function RouteComponent() {
               to="/admin/users"
               search={{ page: 1, pageSize: 5 }}
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
-              activeProps={{ className: 'bg-cyan-900' }}
+              activeProps={{ className: "bg-cyan-900" }}
             >
               <Users className="w-5 h-5" />
               <span>Users</span>
@@ -54,8 +65,9 @@ function RouteComponent() {
 
             <Link
               to="/admin/teams"
+              search={{ page: 1, pageSize: 5 }}
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
-              activeProps={{ className: 'bg-cyan-900' }}
+              activeProps={{ className: "bg-cyan-900" }}
             >
               <UsersIcon className="w-5 h-5" />
               <span>Teams</span>
@@ -64,7 +76,7 @@ function RouteComponent() {
             <Link
               to="/admin/accounting"
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
-              activeProps={{ className: 'bg-cyan-900' }}
+              activeProps={{ className: "bg-cyan-900" }}
             >
               <Calculator className="w-5 h-5" />
               <span>Accounting</span>
@@ -73,7 +85,7 @@ function RouteComponent() {
             <Link
               to="/admin/support"
               className="flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-cyan-600 transition-colors"
-              activeProps={{ className: 'bg-cyan-900' }}
+              activeProps={{ className: "bg-cyan-900" }}
             >
               <HelpCircle className="w-5 h-5" />
               <span>Support</span>
@@ -99,5 +111,5 @@ function RouteComponent() {
         </div>
       </main>
     </div>
-  )
+  );
 }

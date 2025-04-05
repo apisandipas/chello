@@ -1,6 +1,7 @@
 
 import { useSession } from 'vinxi/http';
 import type { User } from '@prisma/client';
+import { env } from '../env';
 
 export type SessionUser = {
   email: User['email'];
@@ -10,6 +11,6 @@ export type SessionUser = {
 
 export function useAppSession() {
   return useSession<SessionUser>({
-    password: process.env.SESSION_SECRET || '',
+    password: env.SESSION_SECRET,
   });
 }    
