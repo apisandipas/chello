@@ -1,7 +1,6 @@
 import { Card } from "@prisma/client";
 import { useRouter } from "@tanstack/react-router";
 import { useRef, useState, useEffect } from "react";
-import { toast } from "sonner";
 import { updateCardFn } from "~/lib/services/cards";
 
 export default function CardHeader({ card }: { card: Card }) {
@@ -50,7 +49,12 @@ export default function CardHeader({ card }: { card: Card }) {
           onBlur={handleNameBlur}
         />
       ) : (
-        <h2 className="text-xl font-semibold w-full" onClick={() => setIsEditing(true)}>{card.name}</h2>
+        <h2
+          className="text-xl font-semibold w-full"
+          onClick={() => !card.isArchived && setIsEditing(true)}
+        >
+          {card.name} {card.isArchived && "- Archived"}
+        </h2>
       )}
     </div>
   );

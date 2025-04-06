@@ -73,6 +73,7 @@ model Team {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   users     User[]
+  createdBy String
 }
 
 enum UserRole {

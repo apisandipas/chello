@@ -43,7 +43,7 @@ export const CardContent = ({
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === "Escape") {
       e.preventDefault();
-      await persistNameChange();
+      persistNameChange();
     }
   };
 
