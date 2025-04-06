@@ -13,8 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as BoardsImport } from './routes/boards'
 import { Route as BoardImport } from './routes/board'
-import { Route as AdminImport } from './routes/admin'
 import { Route as AboutImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
 import { Route as BoardBoardIdImport } from './routes/board/$boardId'
@@ -42,15 +42,15 @@ const BoardRoute = BoardImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const AdminRoute = AdminImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AdminRouteRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -63,7 +63,7 @@ const IndexRoute = IndexImport.update({
 const AdminIndexRoute = AdminIndexImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 
 const BoardBoardIdRoute = BoardBoardIdImport.update({
@@ -99,25 +99,25 @@ const AuthForgotPasswordRoute = AuthForgotPasswordImport.update({
 const AdminUsersRoute = AdminUsersImport.update({
   id: '/users',
   path: '/users',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 
 const AdminTeamsRoute = AdminTeamsImport.update({
   id: '/teams',
   path: '/teams',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 
 const AdminSupportRoute = AdminSupportImport.update({
   id: '/support',
   path: '/support',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 
 const AdminAccountingRoute = AdminAccountingImport.update({
   id: '/accounting',
   path: '/accounting',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 
 const BoardBoardIdCardCardIdRoute = BoardBoardIdCardCardIdImport.update({
@@ -137,18 +137,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminImport
       parentRoute: typeof rootRoute
     }
     '/board': {
@@ -170,28 +170,28 @@ declare module '@tanstack/react-router' {
       path: '/accounting'
       fullPath: '/admin/accounting'
       preLoaderRoute: typeof AdminAccountingImport
-      parentRoute: typeof AdminImport
+      parentRoute: typeof AdminRouteImport
     }
     '/admin/support': {
       id: '/admin/support'
       path: '/support'
       fullPath: '/admin/support'
       preLoaderRoute: typeof AdminSupportImport
-      parentRoute: typeof AdminImport
+      parentRoute: typeof AdminRouteImport
     }
     '/admin/teams': {
       id: '/admin/teams'
       path: '/teams'
       fullPath: '/admin/teams'
       preLoaderRoute: typeof AdminTeamsImport
-      parentRoute: typeof AdminImport
+      parentRoute: typeof AdminRouteImport
     }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersImport
-      parentRoute: typeof AdminImport
+      parentRoute: typeof AdminRouteImport
     }
     '/auth/forgot-password': {
       id: '/auth/forgot-password'
@@ -233,7 +233,7 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexImport
-      parentRoute: typeof AdminImport
+      parentRoute: typeof AdminRouteImport
     }
     '/board/$boardId/card/$cardId': {
       id: '/board/$boardId/card/$cardId'
@@ -247,7 +247,7 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-interface AdminRouteChildren {
+interface AdminRouteRouteChildren {
   AdminAccountingRoute: typeof AdminAccountingRoute
   AdminSupportRoute: typeof AdminSupportRoute
   AdminTeamsRoute: typeof AdminTeamsRoute
@@ -255,7 +255,7 @@ interface AdminRouteChildren {
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminAccountingRoute: AdminAccountingRoute,
   AdminSupportRoute: AdminSupportRoute,
   AdminTeamsRoute: AdminTeamsRoute,
@@ -263,7 +263,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminIndexRoute: AdminIndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
 interface BoardBoardIdRouteChildren {
   BoardBoardIdCardCardIdRoute: typeof BoardBoardIdCardCardIdRoute
@@ -289,8 +291,8 @@ const BoardRouteWithChildren = BoardRoute._addFileChildren(BoardRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
   '/admin/accounting': typeof AdminAccountingRoute
@@ -327,8 +329,8 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
   '/admin/accounting': typeof AdminAccountingRoute
@@ -348,8 +350,8 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
     | '/admin'
+    | '/about'
     | '/board'
     | '/boards'
     | '/admin/accounting'
@@ -383,8 +385,8 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/about'
     | '/admin'
+    | '/about'
     | '/board'
     | '/boards'
     | '/admin/accounting'
@@ -403,8 +405,8 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
   BoardRoute: typeof BoardRouteWithChildren
   BoardsRoute: typeof BoardsRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -415,8 +417,8 @@ export interface RootRouteChildren {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
   BoardRoute: BoardRouteWithChildren,
   BoardsRoute: BoardsRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
@@ -436,8 +438,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/about",
         "/admin",
+        "/about",
         "/board",
         "/boards",
         "/auth/forgot-password",
@@ -449,11 +451,8 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
-    "/about": {
-      "filePath": "about.tsx"
-    },
     "/admin": {
-      "filePath": "admin.tsx",
+      "filePath": "admin/route.tsx",
       "children": [
         "/admin/accounting",
         "/admin/support",
@@ -461,6 +460,9 @@ export const routeTree = rootRoute
         "/admin/users",
         "/admin/"
       ]
+    },
+    "/about": {
+      "filePath": "about.tsx"
     },
     "/board": {
       "filePath": "board.tsx",
