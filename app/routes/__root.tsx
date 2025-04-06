@@ -82,7 +82,6 @@ function RootDocument({ children }: Readonly<{ children: ReactNode }>) {
   const isAuthenticated = !!ctx.user;
   const isDashboardRoute = router.state.location.pathname.startsWith("/admin");
 
-  console.log("isDashboardRoute", isDashboardRoute);
   return (
     <html>
       <head>
