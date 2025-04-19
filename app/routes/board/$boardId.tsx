@@ -18,7 +18,12 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
-import { createFileRoute, Outlet, redirect, useRouter } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Outlet,
+  redirect,
+  useRouter,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { BoardCard } from "~/components/cards/BoardCard";
 import { BoardColumn } from "~/components/columns/BoardColumn";
@@ -28,8 +33,9 @@ import {
   updateCardOrderFn,
   updateColumnOrderFn,
 } from "~/lib/services/boards";
-import type { Card, Column } from "~/types";
+import { Card, Column } from "@prisma/client";
 import { BoardHeader } from "~/components/boards/BoardHeader";
+import { z } from "zod";
 
 const dropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
@@ -41,10 +47,35 @@ const dropAnimation = {
   }),
 };
 
+const boardSearchSchema = z.object({
+  showArchived: z.boolean().optional().default(false),
+});
+
 export const Route = createFileRoute("/board/$boardId")({
   component: BoardComponent,
-  loader: async ({ params }) =>
-    getBoardFn({ data: { boardId: params.boardId } }),
+  loaderDeps: ({ search }) => {
+    return {
+      showArchived: search.showArchived,
+    };
+  },
+  beforeLoad: ({ context, search }) => {
+    if (!context.user) {
+      throw redirect({
+        to: "/auth/login",
+        statusCode: 301,
+      });
+    }
+    return {
+      user: context.user,
+      showArchived: search.showArchived,
+    };
+  },
+  validateSearch: boardSearchSchema,
+  loader: async ({ params, deps }) => {
+    return getBoardFn({
+      data: { boardId: params.boardId, isArchived: deps.showArchived },
+    });
+  },
 });
 
 function BoardComponent() {
@@ -74,7 +105,7 @@ function BoardComponent() {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   const handleUpdateColumnOrder = async (columns: Column[]) => {
@@ -140,10 +171,10 @@ function BoardComponent() {
 
       if (isColumn) {
         const oldIndex = boardData.columns.findIndex(
-          (col) => col.id === active.id
+          (col) => col.id === active.id,
         );
         const newIndex = boardData.columns.findIndex(
-          (col) => col.id === over.id
+          (col) => col.id === over.id,
         );
 
         // Update the local state immediately
@@ -176,20 +207,21 @@ function BoardComponent() {
     if (!isActiveACard) return;
 
     const activeColumn = boardData.columns.find((col) =>
-      col.cards.find((card) => card.id === activeId)
+      col.cards.find((card) => card.id === activeId),
     );
 
     const overColumn = boardData.columns.find(
-      (col) => col.id === overId || col.cards.some((card) => card.id === overId)
+      (col) =>
+        col.id === overId || col.cards.some((card) => card.id === overId),
     );
 
     if (!activeColumn || !overColumn) return;
 
     const activeCardIndex = activeColumn.cards.findIndex(
-      (card) => card.id === activeId
+      (card) => card.id === activeId,
     );
     const overCardIndex = overColumn.cards.findIndex(
-      (card) => card.id === overId
+      (card) => card.id === overId,
     );
 
     if (activeColumn.id === overColumn.id) {
@@ -197,7 +229,7 @@ function BoardComponent() {
       const newCards = arrayMove(
         activeColumn.cards,
         activeCardIndex,
-        overCardIndex
+        overCardIndex,
       );
       // Update local state immediately
       activeColumn.cards = newCards;
@@ -240,7 +272,7 @@ function BoardComponent() {
           enableDragAndDrop={isClient}
         />
       ))}
-      <AddAnotherColumn boardId={boardData.id} />
+      {!boardData.isArchived && <AddAnotherColumn boardId={boardData.id} />}
     </div>
   );
   return (

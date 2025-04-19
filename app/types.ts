@@ -1,29 +1,4 @@
-export interface Card {
-  id: string;
-  name: string;
-  createdAt: Date;
-  updatedAt: Date;
-  sortOrder: number;
-  columnId: string;
-}
-
-export interface Column {
-  id: string;
-  name: string;
-  cards: Card[];
-  boardId: string;
-  createdAt: Date;
-  updatedAt: Date;
-  sortOrder: number;
-}
-
-export interface Board {
-  id: string;
-  name: string;
-  columns: Column[];
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Board, User } from "@prisma/client";
 
 export type BoardWithCounts = Board & {
   _count: {
@@ -31,13 +6,6 @@ export type BoardWithCounts = Board & {
     cards: number;
   };
 };
-
-export interface User {
-  id: string;
-  email: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export interface AuthResponse {
   user: User | null;

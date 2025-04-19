@@ -24,6 +24,7 @@ import { useRouter } from "@tanstack/react-router";
 import { toast } from "sonner";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { updateCardFn } from "~/lib/services/cards";
 
 export default function CardDescription({ card }: { card: Card }) {
   const [isEditing, setIsEditing] = useState(false);
@@ -48,6 +49,18 @@ export default function CardDescription({ card }: { card: Card }) {
     setDescription(card.description ?? "");
   }, [card.description]);
 
+  if (card.isArchived) {
+    console.log("got here?");
+    return (
+      <div className="flex flex-col gap-2">
+        <h3 className="text-lg font-bold">Description</h3>
+        <div className=" p-2 min-h-[200px] prose">
+          <Markdown remarkPlugins={[remarkGfm]}>{card.description}</Markdown>
+        </div>
+      </div>
+    );
+  }
+
   if (!isEditing && !description) {
     return (
       <div className="flex flex-col gap-2">
@@ -67,12 +80,14 @@ export default function CardDescription({ card }: { card: Card }) {
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
           <h3 className="text-lg font-bold">Description</h3>
-          <button
-            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md ml-auto cursor-pointer"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </button>
+          {!card.isArchived && (
+            <button
+              className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md ml-auto cursor-pointer"
+              onClick={() => setIsEditing(true)}
+            >
+              Edit
+            </button>
+          )}
         </div>
         <div className=" p-2 min-h-[200px] prose">
           <Markdown remarkPlugins={[remarkGfm]}>{card.description}</Markdown>

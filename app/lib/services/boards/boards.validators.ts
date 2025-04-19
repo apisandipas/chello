@@ -2,7 +2,9 @@
 import { z } from "zod";
 
 export const updateBoardValidator = (data: unknown) => {
-  const validated = z.object({ id: z.string(), name: z.string() }).safeParse(data);
+  const validated = z
+    .object({ id: z.string(), name: z.string() })
+    .safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");
   }
@@ -10,7 +12,9 @@ export const updateBoardValidator = (data: unknown) => {
 };
 
 export const getBoardValidator = (data: unknown) => {
-  const validated = z.object({ boardId: z.string() }).safeParse(data);
+  const validated = z
+    .object({ boardId: z.string(), isArchived: z.boolean().optional() })
+    .safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");
   }
@@ -24,7 +28,7 @@ export const updateColumnOrderValidator = (data: unknown) => {
         z.object({
           id: z.string(),
           sortOrder: z.number(),
-        })
+        }),
       ),
     })
     .safeParse(data);
@@ -42,7 +46,7 @@ export const updateCardOrderValidator = (data: unknown) => {
           id: z.string(),
           sortOrder: z.number(),
           columnId: z.string(),
-        })
+        }),
       ),
     })
     .safeParse(data);
@@ -53,10 +57,12 @@ export const updateCardOrderValidator = (data: unknown) => {
 };
 
 export const getBoardsValidator = (data: unknown) => {
-  const validated = z.object({
-    userId: z.string(),
-    showArchived: z.boolean().optional().default(false)
-  }).safeParse(data);
+  const validated = z
+    .object({
+      userId: z.string(),
+      showArchived: z.boolean().optional().default(false),
+    })
+    .safeParse(data);
   if (!validated.success) {
     throw new Error("Invalid data");
   }
@@ -86,3 +92,4 @@ export const unarchiveBoardValidator = (data: unknown) => {
   }
   return validated.data;
 };
+

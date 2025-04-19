@@ -4,13 +4,13 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { Column } from "../../types";
 import { AddAnotherCard } from "../cards/AddAnotherCard";
 import { BoardCard } from "../cards/BoardCard";
 import { ColumnHeader } from "./ColumnHeader";
+import { Card, Column } from "@prisma/client";
 
 interface BoardColumnProps {
-  column: Column;
+  column: Column & { cards: Card[] };
   enableDragAndDrop?: boolean;
 }
 
@@ -36,14 +36,14 @@ export function BoardColumn({
 
   const renderCards = () => (
     <div className="flex flex-col gap-2">
-      {column.cards.map((card) => (
+      {column.cards.map((card: Card) => (
         <BoardCard
           key={card.id}
           card={card}
           enableDragAndDrop={enableDragAndDrop}
         />
       ))}
-      <AddAnotherCard columnId={column.id} />
+      {!column.isArchived && <AddAnotherCard columnId={column.id} />}
     </div>
   );
 
@@ -73,7 +73,7 @@ export function BoardColumn({
 
       {enableDragAndDrop ? (
         <SortableContext
-          items={column.cards.map((card) => card.id)}
+          items={column.cards.map((card: Card) => card.id)}
           strategy={verticalListSortingStrategy}
         >
           {renderCards()}

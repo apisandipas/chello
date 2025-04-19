@@ -11,9 +11,10 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ShemoardImport } from './routes/shemoard'
 import { Route as BoardsImport } from './routes/boards'
-import { Route as BoardImport } from './routes/board'
 import { Route as AboutImport } from './routes/about'
+import { Route as BoardRouteImport } from './routes/board/route'
 import { Route as AdminRouteImport } from './routes/admin/route'
 import { Route as IndexImport } from './routes/index'
 import { Route as AdminIndexImport } from './routes/admin/index'
@@ -30,21 +31,27 @@ import { Route as BoardBoardIdCardCardIdImport } from './routes/board/$boardId/c
 
 // Create/Update Routes
 
+const ShemoardRoute = ShemoardImport.update({
+  id: '/shemoard',
+  path: '/shemoard',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const BoardsRoute = BoardsImport.update({
   id: '/boards',
   path: '/boards',
   getParentRoute: () => rootRoute,
 } as any)
 
-const BoardRoute = BoardImport.update({
-  id: '/board',
-  path: '/board',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const BoardRouteRoute = BoardRouteImport.update({
+  id: '/board',
+  path: '/board',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -69,7 +76,7 @@ const AdminIndexRoute = AdminIndexImport.update({
 const BoardBoardIdRoute = BoardBoardIdImport.update({
   id: '/$boardId',
   path: '/$boardId',
-  getParentRoute: () => BoardRoute,
+  getParentRoute: () => BoardRouteRoute,
 } as any)
 
 const AuthSignupRoute = AuthSignupImport.update({
@@ -144,6 +151,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRoute
     }
+    '/board': {
+      id: '/board'
+      path: '/board'
+      fullPath: '/board'
+      preLoaderRoute: typeof BoardRouteImport
+      parentRoute: typeof rootRoute
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -151,18 +165,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/board': {
-      id: '/board'
-      path: '/board'
-      fullPath: '/board'
-      preLoaderRoute: typeof BoardImport
-      parentRoute: typeof rootRoute
-    }
     '/boards': {
       id: '/boards'
       path: '/boards'
       fullPath: '/boards'
       preLoaderRoute: typeof BoardsImport
+      parentRoute: typeof rootRoute
+    }
+    '/shemoard': {
+      id: '/shemoard'
+      path: '/shemoard'
+      fullPath: '/shemoard'
+      preLoaderRoute: typeof ShemoardImport
       parentRoute: typeof rootRoute
     }
     '/admin/accounting': {
@@ -226,7 +240,7 @@ declare module '@tanstack/react-router' {
       path: '/$boardId'
       fullPath: '/board/$boardId'
       preLoaderRoute: typeof BoardBoardIdImport
-      parentRoute: typeof BoardImport
+      parentRoute: typeof BoardRouteImport
     }
     '/admin/': {
       id: '/admin/'
@@ -279,22 +293,25 @@ const BoardBoardIdRouteWithChildren = BoardBoardIdRoute._addFileChildren(
   BoardBoardIdRouteChildren,
 )
 
-interface BoardRouteChildren {
+interface BoardRouteRouteChildren {
   BoardBoardIdRoute: typeof BoardBoardIdRouteWithChildren
 }
 
-const BoardRouteChildren: BoardRouteChildren = {
+const BoardRouteRouteChildren: BoardRouteRouteChildren = {
   BoardBoardIdRoute: BoardBoardIdRouteWithChildren,
 }
 
-const BoardRouteWithChildren = BoardRoute._addFileChildren(BoardRouteChildren)
+const BoardRouteRouteWithChildren = BoardRouteRoute._addFileChildren(
+  BoardRouteRouteChildren,
+)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -310,9 +327,10 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -330,9 +348,10 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteRouteWithChildren
+  '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
-  '/board': typeof BoardRouteWithChildren
   '/boards': typeof BoardsRoute
+  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -351,9 +370,10 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
-    | '/about'
     | '/board'
+    | '/about'
     | '/boards'
+    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -368,9 +388,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
     | '/board'
+    | '/about'
     | '/boards'
+    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -386,9 +407,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
-    | '/about'
     | '/board'
+    | '/about'
     | '/boards'
+    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -406,9 +428,10 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  BoardRouteRoute: typeof BoardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
-  BoardRoute: typeof BoardRouteWithChildren
   BoardsRoute: typeof BoardsRoute
+  ShemoardRoute: typeof ShemoardRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
@@ -418,9 +441,10 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
+  BoardRouteRoute: BoardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
-  BoardRoute: BoardRouteWithChildren,
   BoardsRoute: BoardsRoute,
+  ShemoardRoute: ShemoardRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
@@ -439,9 +463,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/admin",
-        "/about",
         "/board",
+        "/about",
         "/boards",
+        "/shemoard",
         "/auth/forgot-password",
         "/auth/login",
         "/auth/logout",
@@ -461,17 +486,20 @@ export const routeTree = rootRoute
         "/admin/"
       ]
     },
-    "/about": {
-      "filePath": "about.tsx"
-    },
     "/board": {
-      "filePath": "board.tsx",
+      "filePath": "board/route.tsx",
       "children": [
         "/board/$boardId"
       ]
     },
+    "/about": {
+      "filePath": "about.tsx"
+    },
     "/boards": {
       "filePath": "boards.tsx"
+    },
+    "/shemoard": {
+      "filePath": "shemoard.tsx"
     },
     "/admin/accounting": {
       "filePath": "admin/accounting.tsx",

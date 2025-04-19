@@ -1,4 +1,4 @@
-import { Card } from "../../types";
+import { Card } from "@prisma/client";
 import { useState, useRef, useEffect } from "react";
 
 interface CardContentProps {

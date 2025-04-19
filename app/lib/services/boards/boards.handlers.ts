@@ -25,16 +25,17 @@ export const getBoardHandler = async ({ data }) => {
     if (!session.data || !session.data.id) {
       throw new Error("User not found");
     }
+
     const board = await prisma.board.findUnique({
       where: { id: data.boardId, userId: session.data.id },
       include: {
         columns: {
+          where: { isArchived: data.isArchived ?? false },
           orderBy: { sortOrder: "asc" },
-          where: { isArchived: false },
           include: {
             cards: {
+              where: { isArchived: data.isArchived ?? false },
               orderBy: { sortOrder: "asc" },
-              where: { isArchived: false },
             },
           },
         },

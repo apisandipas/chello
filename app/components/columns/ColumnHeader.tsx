@@ -1,4 +1,4 @@
-import { Column } from "~/types";
+import { Column } from "@prisma/client";
 import { ColumnMenu } from "./ColumnMenu";
 import { useEffect, useRef } from "react";
 import { useState } from "react";
@@ -67,6 +67,8 @@ export function ColumnHeader({ column }: { column: Column }) {
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
+              if (column.isArchived) return;
+              console.log("got here?");
               setIsEditing(true);
               setEditedName(column.name);
             }}

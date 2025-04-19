@@ -2,7 +2,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Link, useParams, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
-import type { Card } from "../../types";
+import { Card } from "@prisma/client";
 import { CardMenu } from "./CardMenu";
 import { archiveCardFn, updateCardFn } from "../../lib/services/cards";
 import { toast } from "sonner";
