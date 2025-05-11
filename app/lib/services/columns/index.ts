@@ -1,9 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import {
-  createColumnValidator,
-  archiveColumnValidator,
-  updateColumnValidator,
-} from "./columns.validators";
+import { z } from "zod";
 import {
   createColumnHandler,
   archiveColumnHandler,
@@ -13,17 +9,18 @@ import {
 export const createColumnFn = createServerFn({
   method: "POST",
 })
-  .validator(createColumnValidator)
+  .validator(z.object({ name: z.string(), boardId: z.string() }))
   .handler(createColumnHandler);
 
 export const archiveColumnFn = createServerFn({
   method: "POST",
 })
-  .validator(archiveColumnValidator)
+  .validator(z.object({ columnId: z.string() }))
   .handler(archiveColumnHandler);
 
 export const updateColumnFn = createServerFn({
   method: "POST",
 })
-  .validator(updateColumnValidator)
-  .handler(updateColumnHandler); 
+  .validator(z.object({ columnId: z.string(), name: z.string() }))
+  .handler(updateColumnHandler);
+

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/boards")({
     }
     return {
       user: context.user,
-      showArchived: search.showArchived,
+      showArchived: search.showArchived, // not sure this is needed.
     };
   },
   loader: async ({ deps }) => {

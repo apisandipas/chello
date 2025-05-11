@@ -1,10 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import {
-  createCardValidator,
-  updateCardValidator,
-  archiveCardValidator,
-  getCardValidator,
-} from "./cards.validators";
+import { z } from "zod";
 import {
   createCardHandler,
   updateCardHandler,
@@ -15,23 +10,30 @@ import {
 export const createCardFn = createServerFn({
   method: "POST",
 })
-  .validator(createCardValidator)
+  .validator(z.object({ name: z.string(), columnId: z.string() }))
   .handler(createCardHandler);
 
 export const updateCardFn = createServerFn({
   method: "POST",
 })
-  .validator(updateCardValidator)
+  .validator(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      description: z.string().optional(),
+    }),
+  )
   .handler(updateCardHandler);
 
 export const archiveCardFn = createServerFn({
   method: "POST",
 })
-  .validator(archiveCardValidator)
+  .validator(z.object({ id: z.string() }))
   .handler(archiveCardHandler);
 
 export const getCardFn = createServerFn({
   method: "GET",
 })
-  .validator(getCardValidator)
-  .handler(getCardHandler); 
+  .validator(z.object({ id: z.string() }))
+  .handler(getCardHandler);
+

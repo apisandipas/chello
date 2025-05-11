@@ -11,7 +11,6 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as ShemoardImport } from './routes/shemoard'
 import { Route as BoardsImport } from './routes/boards'
 import { Route as AboutImport } from './routes/about'
 import { Route as BoardRouteImport } from './routes/board/route'
@@ -30,12 +29,6 @@ import { Route as AdminAccountingImport } from './routes/admin/accounting'
 import { Route as BoardBoardIdCardCardIdImport } from './routes/board/$boardId/card/$cardId'
 
 // Create/Update Routes
-
-const ShemoardRoute = ShemoardImport.update({
-  id: '/shemoard',
-  path: '/shemoard',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const BoardsRoute = BoardsImport.update({
   id: '/boards',
@@ -172,13 +165,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BoardsImport
       parentRoute: typeof rootRoute
     }
-    '/shemoard': {
-      id: '/shemoard'
-      path: '/shemoard'
-      fullPath: '/shemoard'
-      preLoaderRoute: typeof ShemoardImport
-      parentRoute: typeof rootRoute
-    }
     '/admin/accounting': {
       id: '/admin/accounting'
       path: '/accounting'
@@ -311,7 +297,6 @@ export interface FileRoutesByFullPath {
   '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/boards': typeof BoardsRoute
-  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -330,7 +315,6 @@ export interface FileRoutesByTo {
   '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/boards': typeof BoardsRoute
-  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -351,7 +335,6 @@ export interface FileRoutesById {
   '/board': typeof BoardRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/boards': typeof BoardsRoute
-  '/shemoard': typeof ShemoardRoute
   '/admin/accounting': typeof AdminAccountingRoute
   '/admin/support': typeof AdminSupportRoute
   '/admin/teams': typeof AdminTeamsRoute
@@ -373,7 +356,6 @@ export interface FileRouteTypes {
     | '/board'
     | '/about'
     | '/boards'
-    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -391,7 +373,6 @@ export interface FileRouteTypes {
     | '/board'
     | '/about'
     | '/boards'
-    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -410,7 +391,6 @@ export interface FileRouteTypes {
     | '/board'
     | '/about'
     | '/boards'
-    | '/shemoard'
     | '/admin/accounting'
     | '/admin/support'
     | '/admin/teams'
@@ -431,7 +411,6 @@ export interface RootRouteChildren {
   BoardRouteRoute: typeof BoardRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   BoardsRoute: typeof BoardsRoute
-  ShemoardRoute: typeof ShemoardRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
@@ -444,7 +423,6 @@ const rootRouteChildren: RootRouteChildren = {
   BoardRouteRoute: BoardRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   BoardsRoute: BoardsRoute,
-  ShemoardRoute: ShemoardRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthLogoutRoute: AuthLogoutRoute,
@@ -466,7 +444,6 @@ export const routeTree = rootRoute
         "/board",
         "/about",
         "/boards",
-        "/shemoard",
         "/auth/forgot-password",
         "/auth/login",
         "/auth/logout",
@@ -497,9 +474,6 @@ export const routeTree = rootRoute
     },
     "/boards": {
       "filePath": "boards.tsx"
-    },
-    "/shemoard": {
-      "filePath": "shemoard.tsx"
     },
     "/admin/accounting": {
       "filePath": "admin/accounting.tsx",
